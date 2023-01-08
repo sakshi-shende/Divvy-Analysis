@@ -1,0 +1,5523 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "4c79af50-3c21-49aa-a2de-1af0376d8651",
+   "metadata": {},
+   "source": [
+    "# Data cleaning of divvy bikes using python"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7b5226c0-e59c-4bee-8a07-ce0383ab9ab5",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### Preparation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ab1bb3c8-db90-452d-8f00-8107d39f8dc8",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 1. Importing library"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "id": "0f084daf-0c4f-4a6e-a712-2e49e1dc7a43",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Collecting geopy\n",
+      "  Downloading geopy-2.3.0-py3-none-any.whl (119 kB)\n",
+      "\u001b[K     |████████████████████████████████| 119 kB 4.8 MB/s eta 0:00:01\n",
+      "\u001b[?25hCollecting geographiclib<3,>=1.52\n",
+      "  Downloading geographiclib-2.0-py3-none-any.whl (40 kB)\n",
+      "\u001b[K     |████████████████████████████████| 40 kB 12.0 MB/s eta 0:00:01\n",
+      "\u001b[?25hInstalling collected packages: geographiclib, geopy\n",
+      "Successfully installed geographiclib-2.0 geopy-2.3.0\n",
+      "Note: you may need to restart the kernel to use updated packages.\n"
+     ]
+    }
+   ],
+   "source": [
+    "pip install geopy"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 191,
+   "id": "fdfcc31f-a488-4ba8-b3b9-0b7aca94bb44",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import geopy\n",
+    "import pandas as pd\n",
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bde1fb2d-852e-490b-9c14-ecadfce60812",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 2. Reading CSV data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4211d7d1-4223-4e14-90df-55825e3ed20a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy202010 = pd.read_csv('~/Downloads/202010-divvy-tripdata.csv')\n",
+    "divvy202011 = pd.read_csv('~/Downloads/202011-divvy-tripdata.csv')\n",
+    "divvy202012 = pd.read_csv('~/Downloads/202012-divvy-tripdata.csv')\n",
+    "divvy202101 = pd.read_csv('~/Downloads/202101-divvy-tripdata.csv')\n",
+    "divvy202102 = pd.read_csv('~/Downloads/202102-divvy-tripdata.csv')\n",
+    "divvy202103 = pd.read_csv('~/Downloads/202103-divvy-tripdata.csv')\n",
+    "divvy202104 = pd.read_csv('~/Downloads/202104-divvy-tripdata.csv')\n",
+    "divvy202105 = pd.read_csv('~/Downloads/202105-divvy-tripdata.csv')\n",
+    "divvy202106 = pd.read_csv('~/Downloads/202106-divvy-tripdata.csv')\n",
+    "divvy202107 = pd.read_csv('~/Downloads/202107-divvy-tripdata.csv')\n",
+    "divvy202108 = pd.read_csv('~/Downloads/202108-divvy-tripdata.csv')\n",
+    "divvy202109 = pd.read_csv('~/Downloads/202109-divvy-tripdata.csv')\n",
+    "divvy202110 = pd.read_csv('~/Downloads/202110-divvy-tripdata.csv')\n",
+    "divvy202111 = pd.read_csv('~/Downloads/202111-divvy-tripdata.csv')\n",
+    "divvy202112 = pd.read_csv('~/Downloads/202112-divvy-tripdata.csv')\n",
+    "divvy202201 = pd.read_csv('~/Downloads/202201-divvy-tripdata.csv')\n",
+    "divvy202202 = pd.read_csv('~/Downloads/202202-divvy-tripdata.csv')\n",
+    "divvy202203 = pd.read_csv('~/Downloads/202203-divvy-tripdata.csv')\n",
+    "divvy202204 = pd.read_csv('~/Downloads/202204-divvy-tripdata.csv')\n",
+    "divvy202205 = pd.read_csv('~/Downloads/202205-divvy-tripdata.csv')\n",
+    "divvy202206 = pd.read_csv('~/Downloads/202206-divvy-tripdata.csv')\n",
+    "divvy202207 = pd.read_csv('~/Downloads/202207-divvy-tripdata.csv')\n",
+    "divvy202208 = pd.read_csv('~/Downloads/202208-divvy-tripdata.csv')\n",
+    "divvy202209 = pd.read_csv('~/Downloads/202209-divvy-publictripdata.csv')\n",
+    "divvy202210 = pd.read_csv('~/Downloads/202210-divvy-tripdata.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 96,
+   "id": "df63139e-35fe-462a-bc05-296cdee512f8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Current working directory: /Users/rolam/Downloads\n",
+      "os.getcwd() returns an object of type: <class 'str'>\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Import the os module\n",
+    "import os\n",
+    "\n",
+    "# Get the current working directory\n",
+    "cwd = os.getcwd()\n",
+    "\n",
+    "# Print the current working directory\n",
+    "print(\"Current working directory: {0}\".format(cwd))\n",
+    "\n",
+    "# Print the type of the returned object\n",
+    "print(\"os.getcwd() returns an object of type: {0}\".format(type(cwd)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3ae9055d-6b81-459e-b645-896cc3d26eb2",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 3. Aggregating the data into one dataframe"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "7ef7184e-cbd5-42db-8642-3903be3b9bc2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy2022 = pd.concat([divvy202201,divvy202202,divvy202203,divvy202204,\n",
+    "                       divvy202205,divvy202206,divvy202207,divvy202208,\n",
+    "                       divvy202209,divvy202210])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "81f901d7-2bd4-44cc-abf8-67cbd2359730",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy2021 = pd.concat([divvy202101,divvy202102,divvy202103,divvy202104,\n",
+    "                       divvy202105,divvy202106,divvy202107,divvy202108,\n",
+    "                       divvy202109,divvy202110,divvy202111,divvy202112])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "1dc31aa3-2c21-48a7-880b-3bee53fa3e0c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy2020 = pd.concat([divvy202010,divvy202011,divvy202012])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "2b8c0a2b-12b9-4fc4-ba06-e7aec16ec896",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all = pd.concat([divvy2020,divvy2021,divvy2022])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "97fda178-c734-4c66-919f-436093a77e4e",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 4. Checking number of null data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "a8f6870f-fcc3-44fb-8504-03135b1dcb8d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ride_id               1.000000\n",
+       "rideable_type         1.000000\n",
+       "started_at            1.000000\n",
+       "ended_at              1.000000\n",
+       "start_station_name    0.868972\n",
+       "start_station_id      0.868945\n",
+       "end_station_name      0.859231\n",
+       "end_station_id        0.859210\n",
+       "start_lat             1.000000\n",
+       "start_lng             1.000000\n",
+       "end_lat               0.999033\n",
+       "end_lng               0.999033\n",
+       "member_casual         1.000000\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "null_data = divvy_all.count()/len(divvy_all)\n",
+    "null_data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "ac4c8198-080c-41d2-b16e-ec0767626791",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "Int64Index: 11523181 entries, 0 to 558684\n",
+      "Data columns (total 13 columns):\n",
+      " #   Column              Dtype  \n",
+      "---  ------              -----  \n",
+      " 0   ride_id             object \n",
+      " 1   rideable_type       object \n",
+      " 2   started_at          object \n",
+      " 3   ended_at            object \n",
+      " 4   start_station_name  object \n",
+      " 5   start_station_id    object \n",
+      " 6   end_station_name    object \n",
+      " 7   end_station_id      object \n",
+      " 8   start_lat           float64\n",
+      " 9   start_lng           float64\n",
+      " 10  end_lat             float64\n",
+      " 11  end_lng             float64\n",
+      " 12  member_casual       object \n",
+      "dtypes: float64(4), object(9)\n",
+      "memory usage: 1.2+ GB\n"
+     ]
+    }
+   ],
+   "source": [
+    "divvy_all.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "4ff147cb-1378-4e9a-8055-c901be75c7c9",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 5. Inspecting the total of null data that we have, combination of empty start and end station name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 136,
+   "id": "0b427ab6-fd4a-4954-8010-0fe8c664f931",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "empty_divvy = divvy_all[pd.isna(divvy_all.start_station_name)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 137,
+   "id": "5fb6889c-8605-4844-95c8-55092e8ee23f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "empty_divvy2 = divvy_all[pd.isna(divvy_all.end_station_name)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 138,
+   "id": "12385bac-22ea-45cd-b4a6-55d7057470db",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "empty_divvy_all = pd.concat([empty_divvy,empty_divvy2],axis=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 139,
+   "id": "c82061bf-656d-4693-9731-a672441468b9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "empty_divvy_all_drop = empty_divvy_all.drop_duplicates(keep=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 140,
+   "id": "4919c749-9e83-46c9-ad8b-912917dc99e1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1428600"
+      ]
+     },
+     "execution_count": 140,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(empty_divvy_all_drop)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 141,
+   "id": "522237a2-35d3-4492-b49d-290c1bed2dd1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "3131966"
+      ]
+     },
+     "execution_count": 141,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(empty_divvy_all)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 142,
+   "id": "be832cdf-de21-4ae8-a9ed-d911214971af",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "empty_divvy_all_first = empty_divvy_all.drop_duplicates(keep=\"first\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 144,
+   "id": "a679003a-82b9-4e0e-88d7-8ccc0b742be7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "Total_data_null = len(empty_divvy_all_first)/len(divvy_all)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 145,
+   "id": "abc39126-cb9b-4335-854d-a61b6569d896",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.19788659051697619"
+      ]
+     },
+     "execution_count": 145,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "Total_data_null"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cac13ce0-c98b-4785-b46d-bc9583781251",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### 6. There is a duplicate in the ride id but the combination of the rest of the columns says that it is a different trip"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 128,
+   "id": "9a935cf2-e485-40bd-96cc-8a2f6e18d584",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "209"
+      ]
+     },
+     "execution_count": 128,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sum(divvy_all.duplicated(subset=['ride_id']))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 129,
+   "id": "353c582e-1aac-4165-a67d-6f1f370f7c81",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0"
+      ]
+     },
+     "execution_count": 129,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "sum(divvy_all.duplicated(subset=['ride_id','started_at']))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "896f9a03-29e4-4466-a717-84345879d30c",
+   "metadata": {
+    "tags": []
+   },
+   "source": [
+    "### Data Cleaning"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7f0caffe-e130-4485-85b1-c5ce9c427183",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Problem 1: How to handle null data in the start and end station name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "b4628b12-e823-4043-a3e6-38e16bf26b03",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_start = pd.DataFrame(list(set(list(zip(empty_divvy.start_lat,empty_divvy.start_lng)))))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 146,
+   "id": "8cac0eac-d364-46bc-a89a-43d511cb3e09",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_end = pd.DataFrame(list(set(list(zip(empty_divvy2.end_lat,empty_divvy2.end_lng)))))\n",
+    "\n",
+    "#Result: set does not remove duplicate tupple of NaN, so in unique_end data with NaN is still available"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 151,
+   "id": "c8d1e749-aa6f-4d50-b09a-8986ff0ab40d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    11140\n",
+       "1    11140\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 151,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "pd.isna(unique_end).sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 241,
+   "id": "975dc91f-65a8-4183-a559-d70af180a0f1",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    1003\n",
+       "1    1003\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 241,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(unique_end) - pd.isna(unique_end).sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 253,
+   "id": "a16c8918-fc2c-46bc-951a-a289dd71b641",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "22280"
+      ]
+     },
+     "execution_count": 253,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "pd.isna(list(zip(empty_divvy2.end_lat,empty_divvy2.end_lng))).sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 287,
+   "id": "08ff96e3-b267-4f6c-9098-1f99f58ee254",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_end2 = pd.DataFrame(unique_end.dropna()).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 269,
+   "id": "afca0dcf-7df9-402e-a101-f855c6bdcfa5",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1003"
+      ]
+     },
+     "execution_count": 269,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(unique_end2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8a066543-3a41-4502-91aa-876f5fa819fe",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Get the Station Table Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 155,
+   "id": "bde5b60a-c06a-436a-924e-ea2e445b52f0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "table_station = pd.read_csv('~/Downloads/divvy_data/Divvy_Bicycle_Stations.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 371,
+   "id": "e2d3f2f9-b84f-49a1-9b62-adb05adb35fa",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1594046383808271024</td>\n",
+       "      <td>Troy St &amp; Jackson Blvd</td>\n",
+       "      <td>9</td>\n",
+       "      <td>9</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.877505</td>\n",
+       "      <td>-87.704850</td>\n",
+       "      <td>(41.877505, -87.70485)</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>641</td>\n",
+       "      <td>Central Park Ave &amp; Bloomingdale Ave</td>\n",
+       "      <td>11</td>\n",
+       "      <td>11</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.914166</td>\n",
+       "      <td>-87.716755</td>\n",
+       "      <td>(41.914166, -87.716755)</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1683527931525155814</td>\n",
+       "      <td>Public Rack - Cornell Ave &amp; 87th Pl</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.736881</td>\n",
+       "      <td>-87.583146</td>\n",
+       "      <td>(41.73688127, -87.58314552)</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>367</td>\n",
+       "      <td>Racine Ave &amp; 35th St</td>\n",
+       "      <td>15</td>\n",
+       "      <td>15</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.830689</td>\n",
+       "      <td>-87.656211</td>\n",
+       "      <td>(41.83068856472101, -87.65621066093445)</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1673852313397164648</td>\n",
+       "      <td>Public Rack - Francisco Ave &amp; Touhy Ave</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>42.011865</td>\n",
+       "      <td>-87.701317</td>\n",
+       "      <td>(42.011865, -87.701317)</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                    ID                             Station Name  Total Docks  \\\n",
+       "0  1594046383808271024                   Troy St & Jackson Blvd            9   \n",
+       "1                  641      Central Park Ave & Bloomingdale Ave           11   \n",
+       "2  1683527931525155814      Public Rack - Cornell Ave & 87th Pl            1   \n",
+       "3                  367                     Racine Ave & 35th St           15   \n",
+       "4  1673852313397164648  Public Rack - Francisco Ave & Touhy Ave            2   \n",
+       "\n",
+       "   Docks in Service      Status   Latitude  Longitude  \\\n",
+       "0                 9  In Service  41.877505 -87.704850   \n",
+       "1                11  In Service  41.914166 -87.716755   \n",
+       "2                 1  In Service  41.736881 -87.583146   \n",
+       "3                15  In Service  41.830689 -87.656211   \n",
+       "4                 2  In Service  42.011865 -87.701317   \n",
+       "\n",
+       "                                  Location  \n",
+       "0                   (41.877505, -87.70485)  \n",
+       "1                  (41.914166, -87.716755)  \n",
+       "2              (41.73688127, -87.58314552)  \n",
+       "3  (41.83068856472101, -87.65621066093445)  \n",
+       "4                  (42.011865, -87.701317)  "
+      ]
+     },
+     "execution_count": 371,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "table_station.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bd143b21-269a-4897-8007-1df37741e2bd",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Function to calculate the distance between lattitude and longitude"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 219,
+   "id": "ca8e617f-36e9-4cfd-84e0-fd4bdfa3c8a2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from math import radians, cos, sin, asin, sqrt\n",
+    "\n",
+    "def haversine(lat1, lon1, lat2, lon2):\n",
+    "    R = 3959.87433 # this is in miles.  For Earth radius in kilometers use 6372.8 km\n",
+    "    dLat = np.radians((lat2 - lat1))\n",
+    "    dLon = np.radians((lon2 - lon1))\n",
+    "    lat1 = np.radians(lat1)\n",
+    "    lat2 = np.radians(lat2)\n",
+    "    a = np.sin(dLat/2)**2 + np.cos(lat1)*np.cos(lat2)*np.sin(dLon/2)**2\n",
+    "    c = 2*np.arcsin(np.sqrt(a))\n",
+    "    \n",
+    "    return R * c"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "566dfb69-c947-4a4d-9f57-0c3e19e5c187",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Process to fill in the start_id and start_name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 327,
+   "id": "4782b105-387e-4bd8-88ea-ce083b7772e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df = pd.merge(unique_start, table_station,  how='cross')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 285,
+   "id": "fda7858f-477d-4eaa-aead-d2c0555915f7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0                   float64\n",
+       "1                   float64\n",
+       "ID                    int64\n",
+       "Station Name         object\n",
+       "Total Docks           int64\n",
+       "Docks in Service      int64\n",
+       "Status               object\n",
+       "Latitude            float64\n",
+       "Longitude           float64\n",
+       "Location             object\n",
+       "dtype: object"
+      ]
+     },
+     "execution_count": 285,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df.dtypes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 328,
+   "id": "a9a2f0b3-60ec-44d4-a885-c4c2e82c873c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df[\"distance\"] = haversine((new_df[0]),(new_df[1]),(new_df[\"Latitude\"]),(new_df[\"Longitude\"]))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 329,
+   "id": "4c9ef8d1-9fdb-4fd1-82e0-5471d54410bb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_ = new_df.sort_values(\"distance\").drop_duplicates([0,1], keep='first').reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 351,
+   "id": "6297db7f-656d-41ca-bc72-eef5d2bbaedf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "number of data match that is more than 1 mile:  36\n",
+      "the maximum distance of the matched data:  2.8125189906809682\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"number of data match that is more than 1 mile: \", len(new_df_[new_df_[\"distance\"]>1]))\n",
+    "print(\"the maximum distance of the matched data: \",new_df_[\"distance\"].max())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 332,
+   "id": "5762e0f0-4349-4d17-b3c3-0c040a80279b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>1</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>41.907655</td>\n",
+       "      <td>-87.672552</td>\n",
+       "      <td>61</td>\n",
+       "      <td>Wood St &amp; Milwaukee Ave</td>\n",
+       "      <td>41.907655</td>\n",
+       "      <td>-87.672552</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>41.648500</td>\n",
+       "      <td>-87.546089</td>\n",
+       "      <td>732</td>\n",
+       "      <td>Hegewisch Metra Station</td>\n",
+       "      <td>41.648501</td>\n",
+       "      <td>-87.546090</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>41.867117</td>\n",
+       "      <td>-87.641087</td>\n",
+       "      <td>57</td>\n",
+       "      <td>Clinton St &amp; Roosevelt Rd</td>\n",
+       "      <td>41.867118</td>\n",
+       "      <td>-87.641088</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>41.910000</td>\n",
+       "      <td>-87.670000</td>\n",
+       "      <td>16</td>\n",
+       "      <td>Paulina Ave &amp; North Ave</td>\n",
+       "      <td>41.909855</td>\n",
+       "      <td>-87.669930</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>41.780000</td>\n",
+       "      <td>-87.630000</td>\n",
+       "      <td>390</td>\n",
+       "      <td>Wentworth Ave &amp; 63rd St</td>\n",
+       "      <td>41.780080</td>\n",
+       "      <td>-87.629746</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           0          1   ID               Station Name   Latitude  Longitude\n",
+       "0  41.907655 -87.672552   61    Wood St & Milwaukee Ave  41.907655 -87.672552\n",
+       "1  41.648500 -87.546089  732    Hegewisch Metra Station  41.648501 -87.546090\n",
+       "2  41.867117 -87.641087   57  Clinton St & Roosevelt Rd  41.867118 -87.641088\n",
+       "3  41.910000 -87.670000   16    Paulina Ave & North Ave  41.909855 -87.669930\n",
+       "4  41.780000 -87.630000  390    Wentworth Ave & 63rd St  41.780080 -87.629746"
+      ]
+     },
+     "execution_count": 332,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df_ref = new_df_.drop(new_df_.columns[[0,5,6,7,10,11]],axis=1)\n",
+    "new_df_ref.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b111e2c2-2318-4c28-ad0e-b6cfa7e01599",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge the approximated start station data with the whole trip data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 411,
+   "id": "cd40bfcf-e875-45be-b133-920186b8347c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed = divvy_all"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 412,
+   "id": "a20b64ce-0774-48f7-82c2-80c2ce920a7d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed = pd.merge(divvy_all_fixed, new_df_ref,  how='left', left_on=['start_lat','start_lng'], right_on = [0,1])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 413,
+   "id": "9ae8e11f-dfbd-43c1-a3ff-e17e5d654820",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#divvy_all_fixed.loc[pd.isna(divvy_all_fixed.start_station_name),\"start_lat\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.start_station_name)][\"Latitude\"]\n",
+    "#divvy_all_fixed.loc[pd.isna(divvy_all_fixed.start_station_name),\"start_lng\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.start_station_name)][\"Longitude\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 414,
+   "id": "cd8621c3-d4ec-483d-a266-cef9d00560e7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed.loc[pd.isna(divvy_all_fixed.start_station_name),\"start_station_name\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.start_station_name)][\"Station Name\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 415,
+   "id": "7d85eee1-6a83-4925-a22b-999f2c1b75bf",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed.loc[pd.isna(divvy_all_fixed.start_station_id),\"start_station_id\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.start_station_id)][\"ID\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 416,
+   "id": "23b26ffd-c399-41df-89ec-7ac494948bc0",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ride_id</th>\n",
+       "      <th>rideable_type</th>\n",
+       "      <th>started_at</th>\n",
+       "      <th>ended_at</th>\n",
+       "      <th>start_station_name</th>\n",
+       "      <th>start_station_id</th>\n",
+       "      <th>end_station_name</th>\n",
+       "      <th>end_station_id</th>\n",
+       "      <th>start_lat</th>\n",
+       "      <th>start_lng</th>\n",
+       "      <th>end_lat</th>\n",
+       "      <th>end_lng</th>\n",
+       "      <th>member_casual</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>ACB6B40CF5B9044C</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:39:43</td>\n",
+       "      <td>2020-10-31 19:57:12</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>Rush St &amp; Hubbard St</td>\n",
+       "      <td>125.0</td>\n",
+       "      <td>41.926101</td>\n",
+       "      <td>-87.638977</td>\n",
+       "      <td>41.890345</td>\n",
+       "      <td>-87.626068</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>DF450C72FD109C01</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:50:08</td>\n",
+       "      <td>2020-11-01 00:04:16</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>Kedzie Ave &amp; Milwaukee Ave</td>\n",
+       "      <td>260.0</td>\n",
+       "      <td>41.948172</td>\n",
+       "      <td>-87.663911</td>\n",
+       "      <td>41.929528</td>\n",
+       "      <td>-87.707818</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>B6396B54A15AC0DF</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:00:01</td>\n",
+       "      <td>2020-10-31 23:08:22</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>University Ave &amp; 57th St</td>\n",
+       "      <td>423.0</td>\n",
+       "      <td>41.773462</td>\n",
+       "      <td>-87.585372</td>\n",
+       "      <td>41.791455</td>\n",
+       "      <td>-87.600050</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>44A4AEE261B9E854</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 22:16:43</td>\n",
+       "      <td>2020-10-31 22:19:35</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>Broadway &amp; Sheridan Rd</td>\n",
+       "      <td>256.0</td>\n",
+       "      <td>41.950855</td>\n",
+       "      <td>-87.659244</td>\n",
+       "      <td>41.952809</td>\n",
+       "      <td>-87.650103</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>10B7DD76A6A2EB95</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:38:19</td>\n",
+       "      <td>2020-10-31 19:54:32</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>Stave St &amp; Armitage Ave</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>41.928857</td>\n",
+       "      <td>-87.663962</td>\n",
+       "      <td>41.917777</td>\n",
+       "      <td>-87.691434</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            ride_id  rideable_type           started_at             ended_at  \\\n",
+       "0  ACB6B40CF5B9044C  electric_bike  2020-10-31 19:39:43  2020-10-31 19:57:12   \n",
+       "1  DF450C72FD109C01  electric_bike  2020-10-31 23:50:08  2020-11-01 00:04:16   \n",
+       "2  B6396B54A15AC0DF  electric_bike  2020-10-31 23:00:01  2020-10-31 23:08:22   \n",
+       "3  44A4AEE261B9E854  electric_bike  2020-10-31 22:16:43  2020-10-31 22:19:35   \n",
+       "4  10B7DD76A6A2EB95  electric_bike  2020-10-31 19:38:19  2020-10-31 19:54:32   \n",
+       "\n",
+       "               start_station_name start_station_id  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy            313.0   \n",
+       "1    Southport Ave & Waveland Ave            227.0   \n",
+       "2      Stony Island Ave & 67th St            102.0   \n",
+       "3             Clark St & Grace St            165.0   \n",
+       "4  Southport Ave & Wrightwood Ave            190.0   \n",
+       "\n",
+       "             end_station_name end_station_id  start_lat  start_lng    end_lat  \\\n",
+       "0        Rush St & Hubbard St          125.0  41.926101 -87.638977  41.890345   \n",
+       "1  Kedzie Ave & Milwaukee Ave          260.0  41.948172 -87.663911  41.929528   \n",
+       "2    University Ave & 57th St          423.0  41.773462 -87.585372  41.791455   \n",
+       "3      Broadway & Sheridan Rd          256.0  41.950855 -87.659244  41.952809   \n",
+       "4     Stave St & Armitage Ave          185.0  41.928857 -87.663962  41.917777   \n",
+       "\n",
+       "     end_lng member_casual  \n",
+       "0 -87.626068        casual  \n",
+       "1 -87.707818        casual  \n",
+       "2 -87.600050        casual  \n",
+       "3 -87.650103        casual  \n",
+       "4 -87.691434        casual  "
+      ]
+     },
+     "execution_count": 416,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "divvy_all_fixed = divvy_all_fixed.drop(divvy_all_fixed.columns[[13,14,15,16,17,18]],axis=1)\n",
+    "divvy_all_fixed.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d648433a-be15-435b-8009-717189141816",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Process for filling in the the end station id and name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 294,
+   "id": "e942fb8e-59d7-4e70-9743-9b4ff4c176aa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df2 = pd.merge(unique_end2, table_station,  how='cross')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 295,
+   "id": "3c4c9f5c-6e97-457b-b7cb-c89820ded9c8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df2[\"distance\"] = haversine((new_df2[0]),(new_df2[1]),(new_df2[\"Latitude\"]),(new_df2[\"Longitude\"]))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 298,
+   "id": "3144afd1-f5d1-4363-877b-fdac1737d9fe",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_2 = new_df2.sort_values(\"distance\").drop_duplicates([0,1], keep='first').reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 356,
+   "id": "5527aaf4-518a-4840-8cf4-5cf50141fc68",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "number of data match that is more than 1 mile:  0.3230309072781655\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"number of data match that is more than 1 mile: \", len(new_df_2[new_df_2[\"distance\"]>1])/len(new_df_2))\n",
+    "coba = (new_df_2[new_df_2[\"distance\"]>1][\"distance\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 360,
+   "id": "f5ccb0e3-a72b-4420-b718-6c42ac9485eb",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAlYAAAGbCAYAAAAGO97oAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjUuMSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/YYfK9AAAACXBIWXMAAAsTAAALEwEAmpwYAAATq0lEQVR4nO3db4xld33f8c+3Xv4EKMKu15Zr0y5IFomDwp+uXFIqROOkcWKE/cSSkahWKZJVyW2hSpUu6QPUSpa2ahWFB00kCwgrhYJcQmIrVlOsTRDtg0DXQAvGULvgmK033klRQkIqqMm3D+YA42V3x5n7nb0z3tdLWt17zrl371c/jUdvn3P33uruAACwur+y7gEAAJ4rhBUAwBBhBQAwRFgBAAwRVgAAQw6se4AkufLKK/vQoUPrHgMAYFsPPfTQH3X3wXMd2xNhdejQoZw8eXLdYwAAbKuq/uB8x1wKBAAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGDIgXUPsFccOvrAeY89fuyWizgJALBfOWMFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDtg2rqvpAVZ2pqi9s2fdvq+pLVfU/quo3q+plW469u6oeq6ovV9VP79LcAAB7zrM5Y/XBJDefte/BJK/u7h9L8j+TvDtJquqGJHck+dHlOb9SVZeNTQsAsIdtG1bd/ckkXz9r38e7++ll8/eTXLfcvzXJR7r7W9391SSPJblxcF4AgD1r4j1W/zDJf1ruX5vka1uOnVr2/YCqurOqTlbVyY2NjYExAADWa6Wwqqp/meTpJB/67q5zPKzP9dzuvqe7D3f34YMHD64yBgDAnnBgp0+sqiNJ3pLkpu7+bjydSvLyLQ+7LsmTOx8PAGD/2NEZq6q6Ocm/SPLW7v7zLYfuT3JHVb2gql6R5Pokn159TACAvW/bM1ZV9eEkb05yZVWdSvKebP4rwBckebCqkuT3u/sfdffDVXVvki9m8xLhXd39nd0aHgBgL9k2rLr7befY/f4LPP7uJHevMhQAwH7kk9cBAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAh24ZVVX2gqs5U1Re27Luiqh6sqkeX28u3HHt3VT1WVV+uqp/ercEBAPaaZ3PG6oNJbj5r39EkJ7r7+iQnlu1U1Q1J7kjyo8tzfqWqLhubFgBgD9s2rLr7k0m+ftbuW5McX+4fT3Lblv0f6e5vdfdXkzyW5MaZUQEA9radvsfq6u4+nSTL7VXL/muTfG3L404t+35AVd1ZVSer6uTGxsYOxwAA2Dum37xe59jX53pgd9/T3Ye7+/DBgweHxwAAuPh2GlZPVdU1SbLcnln2n0ry8i2Puy7JkzsfDwBg/9hpWN2f5Mhy/0iS+7bsv6OqXlBVr0hyfZJPrzYiAMD+cGC7B1TVh5O8OcmVVXUqyXuSHEtyb1W9I8kTSW5Pku5+uKruTfLFJE8nuau7v7NLswMA7CnbhlV3v+08h246z+PvTnL3KkMBAOxHPnkdAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYslJYVdU/q6qHq+oLVfXhqnphVV1RVQ9W1aPL7eVTwwIA7GU7DququjbJP01yuLtfneSyJHckOZrkRHdfn+TEsg0A8Jy36qXAA0l+qKoOJHlRkieT3Jrk+HL8eJLbVnwNAIB9Ycdh1d3/O8m/S/JEktNJ/qS7P57k6u4+vTzmdJKrzvX8qrqzqk5W1cmNjY2djgEAsGescinw8myenXpFkr+e5MVV9fZn+/zuvqe7D3f34YMHD+50DACAPWOVS4E/meSr3b3R3f8vyceS/J0kT1XVNUmy3J5ZfUwAgL3vwArPfSLJG6rqRUn+b5KbkpxM8s0kR5IcW27vW3XIdTt09IHzHnv82C0XcRIAYC/bcVh196eq6qNJPpPk6SSfTXJPkpckubeq3pHN+Lp9YlAAgL1ulTNW6e73JHnPWbu/lc2zVwAAlxSfvA4AMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ1YKq6p6WVV9tKq+VFWPVNWPV9UVVfVgVT263F4+NSwAwF626hmr9yb5ne7+4SSvSfJIkqNJTnT39UlOLNsAAM95Ow6rqnppkjcleX+SdPe3u/uPk9ya5PjysONJblttRACA/WGVM1avTLKR5Neq6rNV9b6qenGSq7v7dJIst1ed68lVdWdVnayqkxsbGyuMAQCwN6wSVgeSvD7Jr3b365J8M3+Jy37dfU93H+7uwwcPHlxhDACAvWGVsDqV5FR3f2rZ/mg2Q+upqromSZbbM6uNCACwP+w4rLr7D5N8rapetey6KckXk9yf5Miy70iS+1aaEABgnziw4vP/SZIPVdXzk3wlyc9lM9burap3JHkiye0rvgYAwL6wUlh19+eSHD7HoZtW+XsBAPYjn7wOADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAw5MC6B9jvDh194ILHHz92y0WaBABYN2esAACGCCsAgCHCCgBgiLACABiyclhV1WVV9dmq+u1l+4qqerCqHl1uL199TACAvW/ijNU7kzyyZftokhPdfX2SE8s2AMBz3kphVVXXJbklyfu27L41yfHl/vEkt63yGgAA+8WqZ6x+OckvJPmLLfuu7u7TSbLcXnWuJ1bVnVV1sqpObmxsrDgGAMD67TisquotSc5090M7eX5339Pdh7v78MGDB3c6BgDAnrHKJ6+/Mclbq+pnk7wwyUur6teTPFVV13T36aq6JsmZiUEBAPa6HZ+x6u53d/d13X0oyR1Jfre7357k/iRHlocdSXLfylMCAOwDu/E5VseS/FRVPZrkp5ZtAIDnvJEvYe7uTyT5xHL//yS5aeLvBQDYT3zyOgDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAw5MC6B3iuO3T0gfMee/zYLRdxEgBgtzljBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ3YcVlX18qr6vap6pKoerqp3LvuvqKoHq+rR5fbyuXEBAPauVc5YPZ3k57v7R5K8IcldVXVDkqNJTnT39UlOLNsAAM95Ow6r7j7d3Z9Z7v9pkkeSXJvk1iTHl4cdT3LbijMCAOwLI++xqqpDSV6X5FNJru7u08lmfCW56jzPubOqTlbVyY2NjYkxAADWauWwqqqXJPmNJO/q7m882+d19z3dfbi7Dx88eHDVMQAA1m6lsKqq52Uzqj7U3R9bdj9VVdcsx69Jcma1EQEA9odV/lVgJXl/kke6+5e2HLo/yZHl/pEk9+18PACA/ePACs99Y5J/kOTzVfW5Zd8vJjmW5N6qekeSJ5LcvtKEAAD7xI7Dqrv/a5I6z+Gbdvr3AgDsVz55HQBgiLACABgirAAAhggrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIat88jorOnT0gfMee/zYLRdxEgBggjNWAABDhBUAwBBhBQAwRFgBAAwRVgAAQ4QVAMAQYQUAMERYAQAMEVYAAEOEFQDAEGEFADBEWAEADBFWAABDDqx7AM7t0NEHznvs8WO3XMRJAIBnyxkrAIAhwgoAYIiwAgAYIqwAAIYIKwCAIcIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABgirAAAhggrAIAhB9Y9ABfXoaMPrHuEfe3xY7esewQA9jBnrAAAhggrAIAhLgU+B7ncBwDr4YwVAMAQYQUAMMSlwH3IpT4A2JucsQIAGCKsAACGCCsAgCHCCgBgyK69eb2qbk7y3iSXJXlfdx/brdeCi8U/HLgwX/kDu8vvoO2t+/fQrpyxqqrLkvz7JD+T5IYkb6uqG3bjtQAA9orduhR4Y5LHuvsr3f3tJB9JcusuvRYAwJ6wW5cCr03ytS3bp5L87a0PqKo7k9y5bP5ZVX15l2bZ6sokf3QRXme/sj7bs0YXUP/G+jwL1ujCrM+FWZ9tXKTfQ3/zfAd2K6zqHPv6GRvd9yS5Z5de/5yq6mR3H76Yr7mfWJ/tWaMLsz7bs0YXZn0uzPpsb91rtFuXAk8lefmW7euSPLlLrwUAsCfsVlj9tyTXV9Urqur5Se5Icv8uvRYAwJ6wK5cCu/vpqvrHSf5zNj9u4QPd/fBuvNZf0kW99LgPWZ/tWaMLsz7bs0YXZn0uzPpsb61rVN29/aMAANiWT14HABgirAAAhlwSYVVVN1fVl6vqsao6uu559oKq+kBVnamqL2zZd0VVPVhVjy63l69zxnWqqpdX1e9V1SNV9XBVvXPZb42SVNULq+rTVfXfl/X5V8t+63OWqrqsqj5bVb+9bFujRVU9XlWfr6rPVdXJZZ/12aKqXlZVH62qLy2/j37cGm2qqlctPzvf/fONqnrXutfnOR9Wvl7nvD6Y5Oaz9h1NcqK7r09yYtm+VD2d5Oe7+0eSvCHJXcvPjTXa9K0kP9Hdr0ny2iQ3V9UbYn3O5Z1JHtmybY2e6e9192u3fO6Q9Xmm9yb5ne7+4SSvyebPkjVK0t1fXn52XpvkbyX58yS/mTWvz3M+rOLrdc6puz+Z5Otn7b41yfHl/vEkt13MmfaS7j7d3Z9Z7v9pNn+ZXRtrlCTpTX+2bD5v+dOxPs9QVdcluSXJ+7bstkYXZn0WVfXSJG9K8v4k6e5vd/cfxxqdy01J/ld3/0HWvD6XQlid6+t1rl3TLHvd1d19OtkMiyRXrXmePaGqDiV5XZJPxRp9z3KJ63NJziR5sLutzw/65SS/kOQvtuyzRt/XST5eVQ8tX3OWWJ+tXplkI8mvLZeT31dVL441Opc7knx4ub/W9bkUwmrbr9eB86mqlyT5jSTv6u5vrHuevaS7v7Ocgr8uyY1V9eo1j7SnVNVbkpzp7ofWPcse9sbufn0236pxV1W9ad0D7TEHkrw+ya929+uSfDOX6GW/C1k+iPytSf7jumdJLo2w8vU6z95TVXVNkiy3Z9Y8z1pV1fOyGVUf6u6PLbut0VmWSxOfyOZ79qzP970xyVur6vFsvgXhJ6rq12ONvqe7n1xuz2TzvTE3xvpsdSrJqeVscJJ8NJuhZY2e6WeSfKa7n1q217o+l0JY+XqdZ+/+JEeW+0eS3LfGWdaqqiqb72t4pLt/acsha5Skqg5W1cuW+z+U5CeTfCnW53u6+93dfV13H8rm753f7e63xxolSarqxVX1V797P8nfT/KFWJ/v6e4/TPK1qnrVsuumJF+MNTrb2/L9y4DJmtfnkvjk9ar62Wy+1+G7X69z93onWr+q+nCSNye5MslTSd6T5LeS3JvkbyR5Isnt3X32G9wvCVX1d5P8lySfz/ffH/OL2Xyf1SW/RlX1Y9l8U+hl2fwftHu7+19X1V+L9fkBVfXmJP+8u99ijTZV1SuzeZYq2bzk9R+6+27r80xV9dps/uOH5yf5SpKfy/LfXKxRqupF2Xwf9Su7+0+WfWv9GbokwgoA4GK4FC4FAgBcFMIKAGCIsAIAGCKsAACGCCsAgCHCCgBgiLACABjy/wFeZmFVQxEm4gAAAABJRU5ErkJggg==\n",
+      "text/plain": [
+       "<Figure size 720x504 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "from matplotlib import pyplot as plt\n",
+    "# Creating histogram\n",
+    "fig, ax = plt.subplots(figsize =(10, 7))\n",
+    "ax.hist(coba, bins = [0, 1, 2,3,4,5,6,7,8,9,10, 20,30,40,50,60,70])\n",
+    " \n",
+    "# Show plot\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 275,
+   "id": "b9eb0fce-bc31-44e4-a982-bd88fedcad29",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>1</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>41.91</td>\n",
+       "      <td>-87.67</td>\n",
+       "      <td>16</td>\n",
+       "      <td>Paulina Ave &amp; North Ave</td>\n",
+       "      <td>41.909855</td>\n",
+       "      <td>-87.669930</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>41.78</td>\n",
+       "      <td>-87.63</td>\n",
+       "      <td>390</td>\n",
+       "      <td>Wentworth Ave &amp; 63rd St</td>\n",
+       "      <td>41.780080</td>\n",
+       "      <td>-87.629746</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>41.88</td>\n",
+       "      <td>-87.77</td>\n",
+       "      <td>1674190492950080346</td>\n",
+       "      <td>Public Rack - Menard Ave &amp; Madison St</td>\n",
+       "      <td>41.880021</td>\n",
+       "      <td>-87.770325</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>41.83</td>\n",
+       "      <td>-87.67</td>\n",
+       "      <td>369</td>\n",
+       "      <td>Wood St &amp; 35th St</td>\n",
+       "      <td>41.830105</td>\n",
+       "      <td>-87.670298</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>41.73</td>\n",
+       "      <td>-87.55</td>\n",
+       "      <td>1674190346921192048</td>\n",
+       "      <td>Public Rack - Houston Ave &amp; 91st St</td>\n",
+       "      <td>41.729964</td>\n",
+       "      <td>-87.549645</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       0      1                   ID                           Station Name  \\\n",
+       "0  41.91 -87.67                   16                Paulina Ave & North Ave   \n",
+       "1  41.78 -87.63                  390                Wentworth Ave & 63rd St   \n",
+       "2  41.88 -87.77  1674190492950080346  Public Rack - Menard Ave & Madison St   \n",
+       "3  41.83 -87.67                  369                      Wood St & 35th St   \n",
+       "4  41.73 -87.55  1674190346921192048    Public Rack - Houston Ave & 91st St   \n",
+       "\n",
+       "    Latitude  Longitude  \n",
+       "0  41.909855 -87.669930  \n",
+       "1  41.780080 -87.629746  \n",
+       "2  41.880021 -87.770325  \n",
+       "3  41.830105 -87.670298  \n",
+       "4  41.729964 -87.549645  "
+      ]
+     },
+     "execution_count": 275,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df_ref2 = new_df_2.drop(new_df_2.columns[[0,5,6,7,10,11]],axis=1)\n",
+    "new_df_ref2.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c1b4061c-97bc-4549-a5c5-05a54af38ca5",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge the approximated End station data with the whole trip data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 417,
+   "id": "34fd5236-4b6b-4548-8a21-07efd80fc0ef",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed = pd.merge(divvy_all_fixed, new_df_ref2,  how='left', left_on=['end_lat','end_lng'], right_on = [0,1])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 418,
+   "id": "50ccd77f-d844-4c96-b0d6-b9d0ba384919",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed.loc[pd.isna(divvy_all_fixed.end_station_name),\"end_station_name\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.end_station_name)][\"Station Name\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 419,
+   "id": "15b05619-87b1-4ef4-8118-775ca043f3fc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed.loc[pd.isna(divvy_all_fixed.end_station_id),\"end_station_id\"] = divvy_all_fixed[pd.isna(divvy_all_fixed.end_station_id)][\"ID\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 420,
+   "id": "25f26497-517d-456d-a856-e4f7330b3865",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ride_id</th>\n",
+       "      <th>rideable_type</th>\n",
+       "      <th>started_at</th>\n",
+       "      <th>ended_at</th>\n",
+       "      <th>start_station_name</th>\n",
+       "      <th>start_station_id</th>\n",
+       "      <th>end_station_name</th>\n",
+       "      <th>end_station_id</th>\n",
+       "      <th>start_lat</th>\n",
+       "      <th>start_lng</th>\n",
+       "      <th>end_lat</th>\n",
+       "      <th>end_lng</th>\n",
+       "      <th>member_casual</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>ACB6B40CF5B9044C</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:39:43</td>\n",
+       "      <td>2020-10-31 19:57:12</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>Rush St &amp; Hubbard St</td>\n",
+       "      <td>125.0</td>\n",
+       "      <td>41.926101</td>\n",
+       "      <td>-87.638977</td>\n",
+       "      <td>41.890345</td>\n",
+       "      <td>-87.626068</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>DF450C72FD109C01</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:50:08</td>\n",
+       "      <td>2020-11-01 00:04:16</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>Kedzie Ave &amp; Milwaukee Ave</td>\n",
+       "      <td>260.0</td>\n",
+       "      <td>41.948172</td>\n",
+       "      <td>-87.663911</td>\n",
+       "      <td>41.929528</td>\n",
+       "      <td>-87.707818</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>B6396B54A15AC0DF</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:00:01</td>\n",
+       "      <td>2020-10-31 23:08:22</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>University Ave &amp; 57th St</td>\n",
+       "      <td>423.0</td>\n",
+       "      <td>41.773462</td>\n",
+       "      <td>-87.585372</td>\n",
+       "      <td>41.791455</td>\n",
+       "      <td>-87.600050</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>44A4AEE261B9E854</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 22:16:43</td>\n",
+       "      <td>2020-10-31 22:19:35</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>Broadway &amp; Sheridan Rd</td>\n",
+       "      <td>256.0</td>\n",
+       "      <td>41.950855</td>\n",
+       "      <td>-87.659244</td>\n",
+       "      <td>41.952809</td>\n",
+       "      <td>-87.650103</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>10B7DD76A6A2EB95</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:38:19</td>\n",
+       "      <td>2020-10-31 19:54:32</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>Stave St &amp; Armitage Ave</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>41.928857</td>\n",
+       "      <td>-87.663962</td>\n",
+       "      <td>41.917777</td>\n",
+       "      <td>-87.691434</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            ride_id  rideable_type           started_at             ended_at  \\\n",
+       "0  ACB6B40CF5B9044C  electric_bike  2020-10-31 19:39:43  2020-10-31 19:57:12   \n",
+       "1  DF450C72FD109C01  electric_bike  2020-10-31 23:50:08  2020-11-01 00:04:16   \n",
+       "2  B6396B54A15AC0DF  electric_bike  2020-10-31 23:00:01  2020-10-31 23:08:22   \n",
+       "3  44A4AEE261B9E854  electric_bike  2020-10-31 22:16:43  2020-10-31 22:19:35   \n",
+       "4  10B7DD76A6A2EB95  electric_bike  2020-10-31 19:38:19  2020-10-31 19:54:32   \n",
+       "\n",
+       "               start_station_name start_station_id  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy            313.0   \n",
+       "1    Southport Ave & Waveland Ave            227.0   \n",
+       "2      Stony Island Ave & 67th St            102.0   \n",
+       "3             Clark St & Grace St            165.0   \n",
+       "4  Southport Ave & Wrightwood Ave            190.0   \n",
+       "\n",
+       "             end_station_name end_station_id  start_lat  start_lng    end_lat  \\\n",
+       "0        Rush St & Hubbard St          125.0  41.926101 -87.638977  41.890345   \n",
+       "1  Kedzie Ave & Milwaukee Ave          260.0  41.948172 -87.663911  41.929528   \n",
+       "2    University Ave & 57th St          423.0  41.773462 -87.585372  41.791455   \n",
+       "3      Broadway & Sheridan Rd          256.0  41.950855 -87.659244  41.952809   \n",
+       "4     Stave St & Armitage Ave          185.0  41.928857 -87.663962  41.917777   \n",
+       "\n",
+       "     end_lng member_casual  \n",
+       "0 -87.626068        casual  \n",
+       "1 -87.707818        casual  \n",
+       "2 -87.600050        casual  \n",
+       "3 -87.650103        casual  \n",
+       "4 -87.691434        casual  "
+      ]
+     },
+     "execution_count": 420,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "divvy_all_fixed = divvy_all_fixed.drop(divvy_all_fixed.columns[[13,14,15,16,17,18]],axis=1)\n",
+    "divvy_all_fixed.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84d8bc4d-f2da-452f-a253-f3ea7873ac29",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Check the filtered data from problem 1 and drop the remaining NaN data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 422,
+   "id": "de44254e-8e33-4c18-a9b1-baf57c0b3e9e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_temp = divvy_all_fixed\n",
+    "divvy_all_fixed = divvy_all_temp.dropna()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 423,
+   "id": "01623760-0f18-4249-88c8-d78a8278bd5a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ride_id               1.0\n",
+       "rideable_type         1.0\n",
+       "started_at            1.0\n",
+       "ended_at              1.0\n",
+       "start_station_name    1.0\n",
+       "start_station_id      1.0\n",
+       "end_station_name      1.0\n",
+       "end_station_id        1.0\n",
+       "start_lat             1.0\n",
+       "start_lng             1.0\n",
+       "end_lat               1.0\n",
+       "end_lng               1.0\n",
+       "member_casual         1.0\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 423,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "null_data = divvy_all_fixed.count()/len(divvy_all_fixed)\n",
+    "\n",
+    "null_data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 426,
+   "id": "58bfc684-8fc9-4c3e-9ad2-27218bcb6c62",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "ride_id               0.999033\n",
+       "rideable_type         0.999033\n",
+       "started_at            0.999033\n",
+       "ended_at              0.999033\n",
+       "start_station_name    0.999033\n",
+       "start_station_id      0.999033\n",
+       "end_station_name      0.999033\n",
+       "end_station_id        0.999033\n",
+       "start_lat             0.999033\n",
+       "start_lng             0.999033\n",
+       "end_lat               0.999033\n",
+       "end_lng               0.999033\n",
+       "member_casual         0.999033\n",
+       "dtype: float64"
+      ]
+     },
+     "execution_count": 426,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data_retained = divvy_all_fixed.count()/len(divvy_all)\n",
+    "\n",
+    "data_retained"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e33658d0-8081-4b91-b65e-cb781a67cd85",
+   "metadata": {},
+   "source": [
+    "#### Problem 2: How to add zipcode data to the table"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "32774da3-5c05-4f33-9eb2-a3f7de9dfde6",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Function get_zipcode"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 441,
+   "id": "83e99425-ae33-434a-b9ff-fe5641f48c1f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "geolocator = geopy.Nominatim(user_agent=\"check_1\")\n",
+    "\n",
+    "#def get_zip_code(x):\n",
+    "#    location = geolocator.reverse(\"{}, {}\".format(x['start_lat'],x['start_lng']))\n",
+    "#    return location.raw['address']\n",
+    "\n",
+    "def get_zipcode(df, geolocator, lat_field, lon_field):\n",
+    "    try:\n",
+    "        location = geolocator.reverse((df[lat_field], df[lon_field]))\n",
+    "        return location.raw['address']['postcode']\n",
+    "    except (AttributeError, KeyError, ValueError):\n",
+    "        print(df[lat_field], df[lon_field])\n",
+    "        return None\n",
+    "\n",
+    "\n",
+    "\n",
+    "geolocator = geopy.Nominatim(user_agent='myusername') #My OpenMap username"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "96f5d362-7e1e-4577-a2e2-9636fb662546",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Comparison of unique station name of the station table and trip table"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 461,
+   "id": "2c8fda84-bae7-4b09-86ee-2a4282b534e7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "number of station in the trip data:  1739\n",
+      "number of station in the station data:  1419\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"number of station in the trip data: \", len(divvy_all_fixed.start_station_name.unique()))\n",
+    "print(\"number of station in the station data: \", len(table_station))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "455fe16a-010d-4e44-854a-a915bc36749d",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Assigning zip code to the station table"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 462,
+   "id": "7e211e0e-7e92-4f34-a402-709ff61185f8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "41.830777 -87.632504\n",
+      "41.875932666 -87.630584536\n"
+     ]
+    }
+   ],
+   "source": [
+    "table_station[\"zipcodes\"] = table_station.apply(\n",
+    "    get_zipcode, axis=1, geolocator=geolocator, \n",
+    "    lat_field='Latitude', lon_field='Longitude')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 467,
+   "id": "85bfce3e-74cf-496f-981e-f5e850a628eb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "table_station.loc[table_station.Latitude == 41.830777,\"zipcodes\"] = 60609\n",
+    "table_station.loc[table_station.Latitude == 41.875932666,\"zipcodes\"] = 60605"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 476,
+   "id": "2658b9b3-403c-4fe2-a56d-f0859d8e9c1c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>zipcodes</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1594046383808271024</td>\n",
+       "      <td>Troy St &amp; Jackson Blvd</td>\n",
+       "      <td>9</td>\n",
+       "      <td>9</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.877505</td>\n",
+       "      <td>-87.704850</td>\n",
+       "      <td>(41.877505, -87.70485)</td>\n",
+       "      <td>60612</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>641</td>\n",
+       "      <td>Central Park Ave &amp; Bloomingdale Ave</td>\n",
+       "      <td>11</td>\n",
+       "      <td>11</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.914166</td>\n",
+       "      <td>-87.716755</td>\n",
+       "      <td>(41.914166, -87.716755)</td>\n",
+       "      <td>60647</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1683527931525155814</td>\n",
+       "      <td>Public Rack - Cornell Ave &amp; 87th Pl</td>\n",
+       "      <td>1</td>\n",
+       "      <td>1</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.736881</td>\n",
+       "      <td>-87.583146</td>\n",
+       "      <td>(41.73688127, -87.58314552)</td>\n",
+       "      <td>60617</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>367</td>\n",
+       "      <td>Racine Ave &amp; 35th St</td>\n",
+       "      <td>15</td>\n",
+       "      <td>15</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.830689</td>\n",
+       "      <td>-87.656211</td>\n",
+       "      <td>(41.83068856472101, -87.65621066093445)</td>\n",
+       "      <td>60609</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1673852313397164648</td>\n",
+       "      <td>Public Rack - Francisco Ave &amp; Touhy Ave</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>42.011865</td>\n",
+       "      <td>-87.701317</td>\n",
+       "      <td>(42.011865, -87.701317)</td>\n",
+       "      <td>60645</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                    ID                             Station Name  Total Docks  \\\n",
+       "0  1594046383808271024                   Troy St & Jackson Blvd            9   \n",
+       "1                  641      Central Park Ave & Bloomingdale Ave           11   \n",
+       "2  1683527931525155814      Public Rack - Cornell Ave & 87th Pl            1   \n",
+       "3                  367                     Racine Ave & 35th St           15   \n",
+       "4  1673852313397164648  Public Rack - Francisco Ave & Touhy Ave            2   \n",
+       "\n",
+       "   Docks in Service      Status   Latitude  Longitude  \\\n",
+       "0                 9  In Service  41.877505 -87.704850   \n",
+       "1                11  In Service  41.914166 -87.716755   \n",
+       "2                 1  In Service  41.736881 -87.583146   \n",
+       "3                15  In Service  41.830689 -87.656211   \n",
+       "4                 2  In Service  42.011865 -87.701317   \n",
+       "\n",
+       "                                  Location zipcodes  \n",
+       "0                   (41.877505, -87.70485)    60612  \n",
+       "1                  (41.914166, -87.716755)    60647  \n",
+       "2              (41.73688127, -87.58314552)    60617  \n",
+       "3  (41.83068856472101, -87.65621066093445)    60609  \n",
+       "4                  (42.011865, -87.701317)    60645  "
+      ]
+     },
+     "execution_count": 476,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "table_station.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "87ce15f4-6031-4f20-adca-06b3a017ddc9",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Getting the list of unique station from the trip table"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 474,
+   "id": "0eff90cf-c67d-45e4-aca0-9275b255b3c0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unique_station_trip = pd.DataFrame(divvy_all_fixed.start_station_name.unique())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 475,
+   "id": "f24de39f-c349-4b3b-b755-bb97e9f94322",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                0\n",
+       "0   Lakeview Ave & Fullerton Pkwy\n",
+       "1    Southport Ave & Waveland Ave\n",
+       "2      Stony Island Ave & 67th St\n",
+       "3             Clark St & Grace St\n",
+       "4  Southport Ave & Wrightwood Ave"
+      ]
+     },
+     "execution_count": 475,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unique_station_trip.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3949eb1f-3f0c-4c7e-8519-113ff019c05f",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### New station table from historical data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 484,
+   "id": "bf1064bc-35a9-4810-a2c4-e865b8028dac",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "additional_station_table = pd.read_csv('~/Downloads/divvy_data/Divvy_Bicycle_Stations_-_Historical.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 485,
+   "id": "f339293c-ce22-4748-91c5-3adf2991467e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>Record</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>643</td>\n",
+       "      <td>09/01/2022 12:05:19 AM</td>\n",
+       "      <td>Smith Park</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15</td>\n",
+       "      <td>14</td>\n",
+       "      <td>11</td>\n",
+       "      <td>3</td>\n",
+       "      <td>21</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.892048</td>\n",
+       "      <td>-87.689397</td>\n",
+       "      <td>POINT (-87.689397 41.892048)</td>\n",
+       "      <td>64320220901000519</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>148</td>\n",
+       "      <td>09/01/2022 12:05:19 AM</td>\n",
+       "      <td>State St &amp; 33rd St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15</td>\n",
+       "      <td>14</td>\n",
+       "      <td>13</td>\n",
+       "      <td>1</td>\n",
+       "      <td>7</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.834734</td>\n",
+       "      <td>-87.625813</td>\n",
+       "      <td>POINT (-87.625813 41.834734)</td>\n",
+       "      <td>14820220901000519</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1674190462885309230</td>\n",
+       "      <td>09/01/2022 12:05:19 AM</td>\n",
+       "      <td>Lowe Park</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.799605</td>\n",
+       "      <td>-87.641464</td>\n",
+       "      <td>POINT (-87.641464 41.799605)</td>\n",
+       "      <td>167419046288530923020220901000519</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>628</td>\n",
+       "      <td>09/01/2022 12:05:19 AM</td>\n",
+       "      <td>Walsh Park</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23</td>\n",
+       "      <td>16</td>\n",
+       "      <td>11</td>\n",
+       "      <td>5</td>\n",
+       "      <td>31</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.914610</td>\n",
+       "      <td>-87.667968</td>\n",
+       "      <td>POINT (-87.667968 41.91461)</td>\n",
+       "      <td>62820220901000519</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>100</td>\n",
+       "      <td>09/01/2022 12:05:19 AM</td>\n",
+       "      <td>Orleans St &amp; Merchandise Mart Plaza</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>35</td>\n",
+       "      <td>30</td>\n",
+       "      <td>29</td>\n",
+       "      <td>1</td>\n",
+       "      <td>3</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.888243</td>\n",
+       "      <td>-87.636390</td>\n",
+       "      <td>POINT (-87.63639 41.888243)</td>\n",
+       "      <td>10020220901000519</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                    ID               Timestamp  \\\n",
+       "0                  643  09/01/2022 12:05:19 AM   \n",
+       "1                  148  09/01/2022 12:05:19 AM   \n",
+       "2  1674190462885309230  09/01/2022 12:05:19 AM   \n",
+       "3                  628  09/01/2022 12:05:19 AM   \n",
+       "4                  100  09/01/2022 12:05:19 AM   \n",
+       "\n",
+       "                          Station Name  Address  Total Docks  \\\n",
+       "0                           Smith Park      NaN           15   \n",
+       "1                   State St & 33rd St      NaN           15   \n",
+       "2                            Lowe Park      NaN            2   \n",
+       "3                           Walsh Park      NaN           23   \n",
+       "4  Orleans St & Merchandise Mart Plaza      NaN           35   \n",
+       "\n",
+       "   Docks in Service  Available Docks  Available Bikes  Percent Full  \\\n",
+       "0                14               11                3            21   \n",
+       "1                14               13                1             7   \n",
+       "2                 2                2                0             0   \n",
+       "3                16               11                5            31   \n",
+       "4                30               29                1             3   \n",
+       "\n",
+       "       Status   Latitude  Longitude                      Location  \\\n",
+       "0  In Service  41.892048 -87.689397  POINT (-87.689397 41.892048)   \n",
+       "1  In Service  41.834734 -87.625813  POINT (-87.625813 41.834734)   \n",
+       "2  In Service  41.799605 -87.641464  POINT (-87.641464 41.799605)   \n",
+       "3  In Service  41.914610 -87.667968   POINT (-87.667968 41.91461)   \n",
+       "4  In Service  41.888243 -87.636390   POINT (-87.63639 41.888243)   \n",
+       "\n",
+       "                              Record  \n",
+       "0                  64320220901000519  \n",
+       "1                  14820220901000519  \n",
+       "2  167419046288530923020220901000519  \n",
+       "3                  62820220901000519  \n",
+       "4                  10020220901000519  "
+      ]
+     },
+     "execution_count": 485,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "additional_station_table.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 487,
+   "id": "bf8661c6-77ff-47d4-8846-d4d5c09a4dda",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "additional_station_table_ref = additional_station_table.sort_values(\"Timestamp\").drop_duplicates([\"Station Name\"], \n",
+    "                                                                                                 keep='first').reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 488,
+   "id": "10ca1b1e-5d01-4e97-97fb-7c350d8cf951",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1718"
+      ]
+     },
+     "execution_count": 488,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(additional_station_table_ref)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d2de78bf-1c20-40a4-9d52-9b27854846bb",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merging Trial 1"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 477,
+   "id": "5c5d4cdf-1d4c-44c0-a283-b3c6235c450a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged = pd.merge(unique_station_trip, table_station,  how='outer', \n",
+    "                                left_on=[0], right_on = [\"Station Name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 479,
+   "id": "14cfa8bd-0404-4f14-9283-320fb5153fea",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1853"
+      ]
+     },
+     "execution_count": 479,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "len(station_table_merged) #this data is 434 more from the station table\n",
+    "#that means there are 434 new station that is not listed"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 673,
+   "id": "c5ad37b9-fadb-4c74-85c8-0b351d75b25c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>zipcodes</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>(41.925858, -87.638973)</td>\n",
+       "      <td>60614</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>(41.94815, -87.66394)</td>\n",
+       "      <td>60613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>(41.77345849948, -87.5853397391)</td>\n",
+       "      <td>60619</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>(41.95078, -87.659172)</td>\n",
+       "      <td>60613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>(41.928773, -87.663913)</td>\n",
+       "      <td>60614</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                0     ID                    Station Name  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  313.0   Lakeview Ave & Fullerton Pkwy   \n",
+       "1    Southport Ave & Waveland Ave  227.0    Southport Ave & Waveland Ave   \n",
+       "2      Stony Island Ave & 67th St  102.0      Stony Island Ave & 67th St   \n",
+       "3             Clark St & Grace St  165.0             Clark St & Grace St   \n",
+       "4  Southport Ave & Wrightwood Ave  190.0  Southport Ave & Wrightwood Ave   \n",
+       "\n",
+       "   Total Docks  Docks in Service      Status   Latitude  Longitude  \\\n",
+       "0         19.0              19.0  In Service  41.925858 -87.638973   \n",
+       "1         23.0              23.0  In Service  41.948150 -87.663940   \n",
+       "2         11.0              11.0  In Service  41.773458 -87.585340   \n",
+       "3         23.0              23.0  In Service  41.950780 -87.659172   \n",
+       "4         15.0              15.0  In Service  41.928773 -87.663913   \n",
+       "\n",
+       "                           Location zipcodes  \n",
+       "0           (41.925858, -87.638973)    60614  \n",
+       "1             (41.94815, -87.66394)    60613  \n",
+       "2  (41.77345849948, -87.5853397391)    60619  \n",
+       "3            (41.95078, -87.659172)    60613  \n",
+       "4           (41.928773, -87.663913)    60614  "
+      ]
+     },
+     "execution_count": 673,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "station_table_merged.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "71caa17e-0cd3-48ec-a661-972a55737cae",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merging Trial 2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 686,
+   "id": "df7c8ba6-9e81-40fe-b500-4c67c232adac",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_2 = pd.merge(unique_station_trip, additional_station_table_ref,  \n",
+    "                                  how='outer', left_on=[0], right_on = [\"Station Name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 523,
+   "id": "3e554dc2-dc0d-4ca6-94bf-b02d9bfd7ad3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "number_trip = divvy_all_fixed.groupby([\"start_station_name\"]).count()[\"ride_id\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 521,
+   "id": "0a2e1089-721e-40d3-a4c8-7067289d3a54",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "number_trip = pd.DataFrame(number_trip).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 687,
+   "id": "0188222b-7866-4ecf-8d85-4d2bc1c0f93b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_2 = pd.merge(station_table_merged_2, number_trip,  \n",
+    "                                  how='outer', left_on=[0], right_on = [\"start_station_name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 688,
+   "id": "73d07ba8-207e-45a8-affd-3dd5381bcc79",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>index</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>Record</th>\n",
+       "      <th>ride_id</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>108733.0</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>POINT (-87.638973 41.925858)</td>\n",
+       "      <td>31320220901130502</td>\n",
+       "      <td>49888.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>108641.0</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>14.0</td>\n",
+       "      <td>70.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>POINT (-87.66394 41.94815)</td>\n",
+       "      <td>22720220901130502</td>\n",
+       "      <td>39495.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>107775.0</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>POINT (-87.5853397391 41.77345849948)</td>\n",
+       "      <td>10220220901130502</td>\n",
+       "      <td>965.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>108007.0</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>POINT (-87.659172 41.95078)</td>\n",
+       "      <td>16520220901130502</td>\n",
+       "      <td>51867.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>108600.0</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>POINT (-87.663913 41.928773)</td>\n",
+       "      <td>19020220901130502</td>\n",
+       "      <td>25727.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                0     index     ID               Timestamp  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  108733.0  313.0  09/01/2022 01:05:02 PM   \n",
+       "1    Southport Ave & Waveland Ave  108641.0  227.0  09/01/2022 01:05:02 PM   \n",
+       "2      Stony Island Ave & 67th St  107775.0  102.0  09/01/2022 01:05:02 PM   \n",
+       "3             Clark St & Grace St  108007.0  165.0  09/01/2022 01:05:02 PM   \n",
+       "4  Southport Ave & Wrightwood Ave  108600.0  190.0  09/01/2022 01:05:02 PM   \n",
+       "\n",
+       "                     Station Name  Address  Total Docks  Docks in Service  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy      NaN         19.0              19.0   \n",
+       "1    Southport Ave & Waveland Ave      NaN         23.0              20.0   \n",
+       "2      Stony Island Ave & 67th St      NaN         11.0              11.0   \n",
+       "3             Clark St & Grace St      NaN         23.0              23.0   \n",
+       "4  Southport Ave & Wrightwood Ave      NaN         15.0              15.0   \n",
+       "\n",
+       "   Available Docks  Available Bikes  Percent Full      Status   Latitude  \\\n",
+       "0             17.0              2.0          11.0  In Service  41.925858   \n",
+       "1              6.0             14.0          70.0  In Service  41.948150   \n",
+       "2              8.0              3.0          27.0  In Service  41.773458   \n",
+       "3             16.0              7.0          30.0  In Service  41.950780   \n",
+       "4             12.0              3.0          20.0  In Service  41.928773   \n",
+       "\n",
+       "   Longitude                               Location             Record  \\\n",
+       "0 -87.638973           POINT (-87.638973 41.925858)  31320220901130502   \n",
+       "1 -87.663940             POINT (-87.66394 41.94815)  22720220901130502   \n",
+       "2 -87.585340  POINT (-87.5853397391 41.77345849948)  10220220901130502   \n",
+       "3 -87.659172            POINT (-87.659172 41.95078)  16520220901130502   \n",
+       "4 -87.663913           POINT (-87.663913 41.928773)  19020220901130502   \n",
+       "\n",
+       "   ride_id  \n",
+       "0  49888.0  \n",
+       "1  39495.0  \n",
+       "2    965.0  \n",
+       "3  51867.0  \n",
+       "4  25727.0  "
+      ]
+     },
+     "execution_count": 688,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "station_table_merged_2.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "75495ddb-44d5-42d7-9953-f7bc15b673dd",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Handling unidentified station"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 525,
+   "id": "68eb75a3-4d8d-42e6-9197-b34d9fc4727c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unidentified_station = pd.DataFrame(station_table_merged_2[pd.isna(station_table_merged_2[\"Station Name\"])])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 527,
+   "id": "c89d893e-bdf3-4b05-95b4-25a7bf5eb268",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "potential_loss_data = unidentified_station[\"ride_id\"].sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 529,
+   "id": "7e3d71fe-b74e-4f0f-8afa-b9456074b576",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>index</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>Record</th>\n",
+       "      <th>ride_id</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>116</th>\n",
+       "      <td>Morgan St &amp; Lake St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>31868.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>64</th>\n",
+       "      <td>Lake Shore Dr &amp; Monroe St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>30638.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>28</th>\n",
+       "      <td>Bissell St &amp; Armitage Ave</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>30230.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>269</th>\n",
+       "      <td>Green St &amp; Randolph St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>28481.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>138</th>\n",
+       "      <td>Lake Shore Dr &amp; North Blvd</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>27943.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                              0  index  ID Timestamp Station Name  Address  \\\n",
+       "116         Morgan St & Lake St    NaN NaN       NaN          NaN      NaN   \n",
+       "64    Lake Shore Dr & Monroe St    NaN NaN       NaN          NaN      NaN   \n",
+       "28    Bissell St & Armitage Ave    NaN NaN       NaN          NaN      NaN   \n",
+       "269      Green St & Randolph St    NaN NaN       NaN          NaN      NaN   \n",
+       "138  Lake Shore Dr & North Blvd    NaN NaN       NaN          NaN      NaN   \n",
+       "\n",
+       "     Total Docks  Docks in Service  Available Docks  Available Bikes  \\\n",
+       "116          NaN               NaN              NaN              NaN   \n",
+       "64           NaN               NaN              NaN              NaN   \n",
+       "28           NaN               NaN              NaN              NaN   \n",
+       "269          NaN               NaN              NaN              NaN   \n",
+       "138          NaN               NaN              NaN              NaN   \n",
+       "\n",
+       "     Percent Full Status  Latitude  Longitude Location Record  ride_id  \n",
+       "116           NaN    NaN       NaN        NaN      NaN    NaN  31868.0  \n",
+       "64            NaN    NaN       NaN        NaN      NaN    NaN  30638.0  \n",
+       "28            NaN    NaN       NaN        NaN      NaN    NaN  30230.0  \n",
+       "269           NaN    NaN       NaN        NaN      NaN    NaN  28481.0  \n",
+       "138           NaN    NaN       NaN        NaN      NaN    NaN  27943.0  "
+      ]
+     },
+     "execution_count": 529,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unidentified_station.sort_values([\"ride_id\"],ascending = False).head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 530,
+   "id": "3af4d300-3150-4dd1-9464-9bbac9cc34fb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from difflib import SequenceMatcher"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 532,
+   "id": "4a87a225-ff21-40a5-9240-b891a8f6f29d",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>0</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>17</td>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>28</td>\n",
+       "      <td>Bissell St &amp; Armitage Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>43</td>\n",
+       "      <td>Broadway &amp; Wilson Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>55</td>\n",
+       "      <td>Lake Shore Dr &amp; Belmont Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>64</td>\n",
+       "      <td>Lake Shore Dr &amp; Monroe St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>162</th>\n",
+       "      <td>1619</td>\n",
+       "      <td>Elizabeth St &amp; Fulton St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>163</th>\n",
+       "      <td>1637</td>\n",
+       "      <td>Public Rack - Prairie Ave &amp; 47th St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>164</th>\n",
+       "      <td>1639</td>\n",
+       "      <td>Public Rack - Pulaski Rd &amp;amp; 65th St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>165</th>\n",
+       "      <td>1650</td>\n",
+       "      <td>Eastlake Ter &amp; Howard St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>166</th>\n",
+       "      <td>1738</td>\n",
+       "      <td>Campbell Ave &amp; Montrose Ave (Temp)</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>167 rows × 2 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     index                                       0\n",
+       "0       17                  WATSON TESTING - DIVVY\n",
+       "1       28               Bissell St & Armitage Ave\n",
+       "2       43                   Broadway & Wilson Ave\n",
+       "3       55             Lake Shore Dr & Belmont Ave\n",
+       "4       64               Lake Shore Dr & Monroe St\n",
+       "..     ...                                     ...\n",
+       "162   1619                Elizabeth St & Fulton St\n",
+       "163   1637    Public Rack - Prairie Ave & 47th St \n",
+       "164   1639  Public Rack - Pulaski Rd &amp; 65th St\n",
+       "165   1650                Eastlake Ter & Howard St\n",
+       "166   1738      Campbell Ave & Montrose Ave (Temp)\n",
+       "\n",
+       "[167 rows x 2 columns]"
+      ]
+     },
+     "execution_count": 532,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unidentified_station_name = unidentified_station[0].reset_index()\n",
+    "unidentified_station_name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 548,
+   "id": "47f0b25c-163b-43fc-bb1f-ee73cbed14cd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_ustation = pd.merge(unidentified_station_name, additional_station_table_ref,  how='cross')\n",
+    "new_df_ustation_ref = pd.DataFrame(new_df_ustation.iloc[:,[1,5]])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 588,
+   "id": "56ae4ff1-77c4-4b37-9fba-075a4887f36a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_ustation_ref[\"similarity\"] = [SequenceMatcher(a = a, b = b).ratio() \n",
+    "                                      for a, b in zip(new_df_ustation_ref[0], new_df_ustation_ref[\"Station Name\"])]\n",
+    "#new_df_ustation_ref[0].apply(lambda e: SequenceMatcher(None, email, e).ratio())\n",
+    "#SequenceMatcher(a=new_df_ustation_ref[0], b=new_df_ustation_ref[1]).ratio()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 563,
+   "id": "1775f065-2f1b-4b64-ada6-2e0fcc9dfcec",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>similarity</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Public Rack - Stony Island &amp; 87th St</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Broadway &amp; Belmont Ave</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Broadway &amp; Argyle St</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Broadway &amp; Berwyn Ave</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Broadway &amp; Wilson - Truman College Vaccination...</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                        0                                       Station Name  \\\n",
+       "0  WATSON TESTING - DIVVY               Public Rack - Stony Island & 87th St   \n",
+       "1  WATSON TESTING - DIVVY                             Broadway & Belmont Ave   \n",
+       "2  WATSON TESTING - DIVVY                               Broadway & Argyle St   \n",
+       "3  WATSON TESTING - DIVVY                              Broadway & Berwyn Ave   \n",
+       "4  WATSON TESTING - DIVVY  Broadway & Wilson - Truman College Vaccination...   \n",
+       "\n",
+       "   similarity  \n",
+       "0         0.0  \n",
+       "1         0.0  \n",
+       "2         0.0  \n",
+       "3         0.0  \n",
+       "4         0.0  "
+      ]
+     },
+     "execution_count": 563,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df_ustation_ref.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 589,
+   "id": "60d4014f-ca9f-478c-b06e-f90b534882e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_ustation_sort = new_df_ustation_ref.sort_values([\"similarity\"],ascending = False).drop_duplicates([0],keep = 'first')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 609,
+   "id": "4e033062-80e1-41d4-a5b5-21bd748a6cc8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>similarity</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>99060</th>\n",
+       "      <td>Spaulding Ave &amp; Bryn Mawr Ave</td>\n",
+       "      <td>Public Rack - Spaulding Ave &amp; Bryn Mawr Ave</td>\n",
+       "      <td>0.805556</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>78443</th>\n",
+       "      <td>Spaulding Ave &amp; Evergreen Ave</td>\n",
+       "      <td>Public Rack - Spaulding Ave &amp; Evergreen Ave</td>\n",
+       "      <td>0.805556</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>250271</th>\n",
+       "      <td>Pullman - Ross Dress for Less</td>\n",
+       "      <td>Public Rack - Pullman - Ross Dress for Less</td>\n",
+       "      <td>0.805556</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>65763</th>\n",
+       "      <td>Bissell St &amp; Armitage Ave - Charging</td>\n",
+       "      <td>Bissell St &amp; Armitage Ave*</td>\n",
+       "      <td>0.806452</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>207945</th>\n",
+       "      <td>California Ave &amp; Ogden Ave</td>\n",
+       "      <td>California Ave &amp; North Ave</td>\n",
+       "      <td>0.807692</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17657</th>\n",
+       "      <td>Green St &amp; Randolph St</td>\n",
+       "      <td>Green St &amp; Randolph St*</td>\n",
+       "      <td>0.977778</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>19361</th>\n",
+       "      <td>Lincoln Ave &amp; Roscoe St</td>\n",
+       "      <td>Lincoln Ave &amp; Roscoe St*</td>\n",
+       "      <td>0.978723</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2197</th>\n",
+       "      <td>Bissell St &amp; Armitage Ave</td>\n",
+       "      <td>Bissell St &amp; Armitage Ave*</td>\n",
+       "      <td>0.980392</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>281545</th>\n",
+       "      <td>Public Rack - Prairie Ave &amp; 47th St</td>\n",
+       "      <td>Public Rack - Prairie Ave &amp; 47th St</td>\n",
+       "      <td>0.985915</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>246419</th>\n",
+       "      <td>Public Rack - Rockwell Ave &amp; Touhy Ave</td>\n",
+       "      <td>Public Rack - Rockwell Ave &amp; Touhy Ave</td>\n",
+       "      <td>0.987013</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>119 rows × 3 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                              0  \\\n",
+       "99060             Spaulding Ave & Bryn Mawr Ave   \n",
+       "78443             Spaulding Ave & Evergreen Ave   \n",
+       "250271            Pullman - Ross Dress for Less   \n",
+       "65763      Bissell St & Armitage Ave - Charging   \n",
+       "207945               California Ave & Ogden Ave   \n",
+       "...                                         ...   \n",
+       "17657                    Green St & Randolph St   \n",
+       "19361                   Lincoln Ave & Roscoe St   \n",
+       "2197                  Bissell St & Armitage Ave   \n",
+       "281545     Public Rack - Prairie Ave & 47th St    \n",
+       "246419  Public Rack - Rockwell Ave & Touhy Ave    \n",
+       "\n",
+       "                                       Station Name  similarity  \n",
+       "99060   Public Rack - Spaulding Ave & Bryn Mawr Ave    0.805556  \n",
+       "78443   Public Rack - Spaulding Ave & Evergreen Ave    0.805556  \n",
+       "250271  Public Rack - Pullman - Ross Dress for Less    0.805556  \n",
+       "65763                    Bissell St & Armitage Ave*    0.806452  \n",
+       "207945                   California Ave & North Ave    0.807692  \n",
+       "...                                             ...         ...  \n",
+       "17657                       Green St & Randolph St*    0.977778  \n",
+       "19361                      Lincoln Ave & Roscoe St*    0.978723  \n",
+       "2197                     Bissell St & Armitage Ave*    0.980392  \n",
+       "281545          Public Rack - Prairie Ave & 47th St    0.985915  \n",
+       "246419       Public Rack - Rockwell Ave & Touhy Ave    0.987013  \n",
+       "\n",
+       "[119 rows x 3 columns]"
+      ]
+     },
+     "execution_count": 609,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df_ustation_sort[new_df_ustation_sort.similarity>0.8].sort_values([\"similarity\"])\n",
+    "#determining the threshold of the similarity between the station name"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 628,
+   "id": "0f89efe8-e0e7-49ac-8dc5-b1117eebfeff",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df_ustation_sort.to_csv('file_name.csv')\n",
+    "#save file to csv for manual inspection\n",
+    "#get 61 additional station data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 635,
+   "id": "eda54652-f1f4-4ae5-b837-a4100f5bc63b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "alt_ustation = pd.read_csv('file_name.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 637,
+   "id": "e01943b8-b59f-4839-8091-68e3c3b54bf4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "alt_ustation = alt_ustation[alt_ustation.Select == 1].iloc[:,[1,2]]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 641,
+   "id": "505ab314-7de4-40f8-9f9c-41d93676c898",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>Station Name</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Public Rack - Rockwell Ave &amp; Touhy Ave</td>\n",
+       "      <td>Public Rack - Rockwell Ave &amp; Touhy Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Public Rack - Prairie Ave &amp; 47th St</td>\n",
+       "      <td>Public Rack - Prairie Ave &amp; 47th St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Bissell St &amp; Armitage Ave</td>\n",
+       "      <td>Bissell St &amp; Armitage Ave*</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Lincoln Ave &amp; Roscoe St</td>\n",
+       "      <td>Lincoln Ave &amp; Roscoe St*</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Green St &amp; Randolph St</td>\n",
+       "      <td>Green St &amp; Randolph St*</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                         0  \\\n",
+       "0  Public Rack - Rockwell Ave & Touhy Ave    \n",
+       "1     Public Rack - Prairie Ave & 47th St    \n",
+       "2                Bissell St & Armitage Ave   \n",
+       "3                  Lincoln Ave & Roscoe St   \n",
+       "4                   Green St & Randolph St   \n",
+       "\n",
+       "                             Station Name  \n",
+       "0  Public Rack - Rockwell Ave & Touhy Ave  \n",
+       "1     Public Rack - Prairie Ave & 47th St  \n",
+       "2              Bissell St & Armitage Ave*  \n",
+       "3                Lincoln Ave & Roscoe St*  \n",
+       "4                 Green St & Randolph St*  "
+      ]
+     },
+     "execution_count": 641,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "alt_ustation.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c4c1a242-58c0-4c00-af1e-11496349c937",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Trial 3"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 649,
+   "id": "3d0ae93b-cbc5-4257-a37c-5db9568db56b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "unidentified_station_2 = pd.merge(unidentified_station, alt_ustation,  \n",
+    "                                  how='left', left_on=[0], right_on = [\"0\"]).iloc[:,[0,16,18]]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 650,
+   "id": "d5ed1811-ce45-49c2-b32b-15c804dc7217",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.006992330899446936"
+      ]
+     },
+     "execution_count": 650,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#number of trip with unidentified station in station table\n",
+    "unidentified_station_2[pd.isna(unidentified_station_2[\"Station Name_y\"])].ride_id.sum()/station_table_merged_2.ride_id.sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 652,
+   "id": "d6d49b92-1ab7-431e-8cb7-a062f0c3c9ef",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.0237100441181542"
+      ]
+     },
+     "execution_count": 652,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#number of trip data from all unidentified station\n",
+    "unidentified_station_2.ride_id.sum()/station_table_merged_2.ride_id.sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 691,
+   "id": "64eab13e-711f-4895-a18e-0291698b1996",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>ride_id</th>\n",
+       "      <th>app_stat</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>780.0</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Bissell St &amp; Armitage Ave</td>\n",
+       "      <td>30230.0</td>\n",
+       "      <td>Bissell St &amp; Armitage Ave*</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Broadway &amp; Wilson Ave</td>\n",
+       "      <td>2799.0</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Lake Shore Dr &amp; Belmont Ave</td>\n",
+       "      <td>14222.0</td>\n",
+       "      <td>DuSable Lake Shore Dr &amp; Belmont Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Lake Shore Dr &amp; Monroe St</td>\n",
+       "      <td>30638.0</td>\n",
+       "      <td>DuSable Lake Shore Dr &amp; Monroe St</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                       new_one  ride_id                             app_stat\n",
+       "0       WATSON TESTING - DIVVY    780.0                                  NaN\n",
+       "1    Bissell St & Armitage Ave  30230.0           Bissell St & Armitage Ave*\n",
+       "2        Broadway & Wilson Ave   2799.0                                  NaN\n",
+       "3  Lake Shore Dr & Belmont Ave  14222.0  DuSable Lake Shore Dr & Belmont Ave\n",
+       "4    Lake Shore Dr & Monroe St  30638.0    DuSable Lake Shore Dr & Monroe St"
+      ]
+     },
+     "execution_count": 691,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "unidentified_station_2.rename(columns = {0:'new_one', 'Station Name_y':'app_stat'}, inplace = True)\n",
+    "unidentified_station_2.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 694,
+   "id": "3861c566-4f7f-4237-80e0-18f259965437",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_3 = pd.merge(station_table_merged_2, unidentified_station_2,  \n",
+    "                                  how='left', left_on=[0], right_on = [\"new_one\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 727,
+   "id": "72501356-c44a-47ad-98aa-3c10fb946ea0",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1885\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>0</th>\n",
+       "      <th>index</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>Record</th>\n",
+       "      <th>ride_id_x</th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>ride_id_y</th>\n",
+       "      <th>app_stat</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>108733.0</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>POINT (-87.638973 41.925858)</td>\n",
+       "      <td>31320220901130502</td>\n",
+       "      <td>49888.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>108641.0</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>14.0</td>\n",
+       "      <td>70.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>POINT (-87.66394 41.94815)</td>\n",
+       "      <td>22720220901130502</td>\n",
+       "      <td>39495.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>107775.0</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>POINT (-87.5853397391 41.77345849948)</td>\n",
+       "      <td>10220220901130502</td>\n",
+       "      <td>965.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>108007.0</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>POINT (-87.659172 41.95078)</td>\n",
+       "      <td>16520220901130502</td>\n",
+       "      <td>51867.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>108600.0</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>POINT (-87.663913 41.928773)</td>\n",
+       "      <td>19020220901130502</td>\n",
+       "      <td>25727.0</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                0     index     ID               Timestamp  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  108733.0  313.0  09/01/2022 01:05:02 PM   \n",
+       "1    Southport Ave & Waveland Ave  108641.0  227.0  09/01/2022 01:05:02 PM   \n",
+       "2      Stony Island Ave & 67th St  107775.0  102.0  09/01/2022 01:05:02 PM   \n",
+       "3             Clark St & Grace St  108007.0  165.0  09/01/2022 01:05:02 PM   \n",
+       "4  Southport Ave & Wrightwood Ave  108600.0  190.0  09/01/2022 01:05:02 PM   \n",
+       "\n",
+       "                     Station Name  Address  Total Docks  Docks in Service  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy      NaN         19.0              19.0   \n",
+       "1    Southport Ave & Waveland Ave      NaN         23.0              20.0   \n",
+       "2      Stony Island Ave & 67th St      NaN         11.0              11.0   \n",
+       "3             Clark St & Grace St      NaN         23.0              23.0   \n",
+       "4  Southport Ave & Wrightwood Ave      NaN         15.0              15.0   \n",
+       "\n",
+       "   Available Docks  Available Bikes  Percent Full      Status   Latitude  \\\n",
+       "0             17.0              2.0          11.0  In Service  41.925858   \n",
+       "1              6.0             14.0          70.0  In Service  41.948150   \n",
+       "2              8.0              3.0          27.0  In Service  41.773458   \n",
+       "3             16.0              7.0          30.0  In Service  41.950780   \n",
+       "4             12.0              3.0          20.0  In Service  41.928773   \n",
+       "\n",
+       "   Longitude                               Location             Record  \\\n",
+       "0 -87.638973           POINT (-87.638973 41.925858)  31320220901130502   \n",
+       "1 -87.663940             POINT (-87.66394 41.94815)  22720220901130502   \n",
+       "2 -87.585340  POINT (-87.5853397391 41.77345849948)  10220220901130502   \n",
+       "3 -87.659172            POINT (-87.659172 41.95078)  16520220901130502   \n",
+       "4 -87.663913           POINT (-87.663913 41.928773)  19020220901130502   \n",
+       "\n",
+       "   ride_id_x new_one  ride_id_y app_stat  \n",
+       "0    49888.0     NaN        NaN      NaN  \n",
+       "1    39495.0     NaN        NaN      NaN  \n",
+       "2      965.0     NaN        NaN      NaN  \n",
+       "3    51867.0     NaN        NaN      NaN  \n",
+       "4    25727.0     NaN        NaN      NaN  "
+      ]
+     },
+     "execution_count": 727,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(len(station_table_merged_3))\n",
+    "station_table_merged_3.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 685,
+   "id": "90bc4ec2-1278-4c69-875b-436f5cea3507",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_2 = pd.merge(station_table_merged_2, station_table_merged,  \n",
+    "                                  how='left', left_on=[0], right_on = [0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 703,
+   "id": "81a5fe62-fc84-4258-ae2b-d4c9d5ad7176",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_3.loc[pd.notna(station_table_merged_3[\"app_stat\"]),\"Station Name\"] = station_table_merged_3.loc[pd.notna(station_table_merged_3[\"app_stat\"]), \"app_stat\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "92879025-c30a-4f26-b4a0-47cd0dead026",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Table 4"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 760,
+   "id": "b8a58378-6067-4432-b269-c2cd0892f67d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1885\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>Station Name</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          new_one                    Station Name\n",
+       "0   Lakeview Ave & Fullerton Pkwy   Lakeview Ave & Fullerton Pkwy\n",
+       "1    Southport Ave & Waveland Ave    Southport Ave & Waveland Ave\n",
+       "2      Stony Island Ave & 67th St      Stony Island Ave & 67th St\n",
+       "3             Clark St & Grace St             Clark St & Grace St\n",
+       "4  Southport Ave & Wrightwood Ave  Southport Ave & Wrightwood Ave"
+      ]
+     },
+     "execution_count": 760,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "station_table_merged_4 = pd.DataFrame(station_table_merged_3[[0,\"Station Name\"]])\n",
+    "print(len(station_table_merged_4))\n",
+    "station_table_merged_4.rename(columns = {0:'new_one'}, inplace = True)\n",
+    "station_table_merged_4.loc[pd.isna(station_table_merged_4[\"Station Name\"]),\"Station Name\"] = \"Not Found\"\n",
+    "station_table_merged_4.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3c6f9d48-7339-4942-956b-d90276f198da",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Table 5"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 762,
+   "id": "3267a817-76a8-41e7-ae3f-a32eeda39ebb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_5 = pd.merge(station_table_merged_4, station_table_merged_2,  \n",
+    "                                  how='left', left_on=[\"Station Name\"], right_on = [\"Station Name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 763,
+   "id": "1479d856-eb85-40cd-99a9-ca10361494be",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1885\n",
+      "1885\n",
+      "1885\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>0</th>\n",
+       "      <th>index</th>\n",
+       "      <th>ID</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks</th>\n",
+       "      <th>Docks in Service</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status</th>\n",
+       "      <th>Latitude</th>\n",
+       "      <th>Longitude</th>\n",
+       "      <th>Location</th>\n",
+       "      <th>Record</th>\n",
+       "      <th>ride_id</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>108733.0</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>POINT (-87.638973 41.925858)</td>\n",
+       "      <td>31320220901130502</td>\n",
+       "      <td>49888.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>108641.0</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>14.0</td>\n",
+       "      <td>70.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>POINT (-87.66394 41.94815)</td>\n",
+       "      <td>22720220901130502</td>\n",
+       "      <td>39495.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>107775.0</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>POINT (-87.5853397391 41.77345849948)</td>\n",
+       "      <td>10220220901130502</td>\n",
+       "      <td>965.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>108007.0</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>POINT (-87.659172 41.95078)</td>\n",
+       "      <td>16520220901130502</td>\n",
+       "      <td>51867.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>108600.0</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>POINT (-87.663913 41.928773)</td>\n",
+       "      <td>19020220901130502</td>\n",
+       "      <td>25727.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          new_one                    Station Name  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy   Lakeview Ave & Fullerton Pkwy   \n",
+       "1    Southport Ave & Waveland Ave    Southport Ave & Waveland Ave   \n",
+       "2      Stony Island Ave & 67th St      Stony Island Ave & 67th St   \n",
+       "3             Clark St & Grace St             Clark St & Grace St   \n",
+       "4  Southport Ave & Wrightwood Ave  Southport Ave & Wrightwood Ave   \n",
+       "\n",
+       "                                0     index     ID               Timestamp  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  108733.0  313.0  09/01/2022 01:05:02 PM   \n",
+       "1    Southport Ave & Waveland Ave  108641.0  227.0  09/01/2022 01:05:02 PM   \n",
+       "2      Stony Island Ave & 67th St  107775.0  102.0  09/01/2022 01:05:02 PM   \n",
+       "3             Clark St & Grace St  108007.0  165.0  09/01/2022 01:05:02 PM   \n",
+       "4  Southport Ave & Wrightwood Ave  108600.0  190.0  09/01/2022 01:05:02 PM   \n",
+       "\n",
+       "   Address  Total Docks  Docks in Service  Available Docks  Available Bikes  \\\n",
+       "0      NaN         19.0              19.0             17.0              2.0   \n",
+       "1      NaN         23.0              20.0              6.0             14.0   \n",
+       "2      NaN         11.0              11.0              8.0              3.0   \n",
+       "3      NaN         23.0              23.0             16.0              7.0   \n",
+       "4      NaN         15.0              15.0             12.0              3.0   \n",
+       "\n",
+       "   Percent Full      Status   Latitude  Longitude  \\\n",
+       "0          11.0  In Service  41.925858 -87.638973   \n",
+       "1          70.0  In Service  41.948150 -87.663940   \n",
+       "2          27.0  In Service  41.773458 -87.585340   \n",
+       "3          30.0  In Service  41.950780 -87.659172   \n",
+       "4          20.0  In Service  41.928773 -87.663913   \n",
+       "\n",
+       "                                Location             Record  ride_id  \n",
+       "0           POINT (-87.638973 41.925858)  31320220901130502  49888.0  \n",
+       "1             POINT (-87.66394 41.94815)  22720220901130502  39495.0  \n",
+       "2  POINT (-87.5853397391 41.77345849948)  10220220901130502    965.0  \n",
+       "3            POINT (-87.659172 41.95078)  16520220901130502  51867.0  \n",
+       "4           POINT (-87.663913 41.928773)  19020220901130502  25727.0  "
+      ]
+     },
+     "execution_count": 763,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(len(station_table_merged_4))\n",
+    "print(len(station_table_merged_2))\n",
+    "print(len(station_table_merged_5))\n",
+    "station_table_merged_5.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "23fd900f-bdce-4871-aed2-5ae3e8f6eede",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Table 6"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 764,
+   "id": "5e33a47e-0ee7-4573-b8fc-94a61d7b1b60",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_6 = pd.merge(station_table_merged_5, station_table_merged,  \n",
+    "                                  how='left', left_on=[\"Station Name\"], right_on = [\"Station Name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 765,
+   "id": "6033b463-fc02-44f3-833b-5f57282d3e71",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "1885\n",
+      "1853\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>0_x</th>\n",
+       "      <th>index</th>\n",
+       "      <th>ID_x</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks_x</th>\n",
+       "      <th>Docks in Service_x</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>...</th>\n",
+       "      <th>ride_id</th>\n",
+       "      <th>0_y</th>\n",
+       "      <th>ID_y</th>\n",
+       "      <th>Total Docks_y</th>\n",
+       "      <th>Docks in Service_y</th>\n",
+       "      <th>Status_y</th>\n",
+       "      <th>Latitude_y</th>\n",
+       "      <th>Longitude_y</th>\n",
+       "      <th>Location_y</th>\n",
+       "      <th>zipcodes</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>108733.0</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>49888.0</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>(41.925858, -87.638973)</td>\n",
+       "      <td>60614</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>108641.0</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>39495.0</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>(41.94815, -87.66394)</td>\n",
+       "      <td>60613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>107775.0</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>965.0</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>(41.77345849948, -87.5853397391)</td>\n",
+       "      <td>60619</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>108007.0</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>51867.0</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>(41.95078, -87.659172)</td>\n",
+       "      <td>60613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>108600.0</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>25727.0</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>(41.928773, -87.663913)</td>\n",
+       "      <td>60614</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 27 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          new_one                    Station Name  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy   Lakeview Ave & Fullerton Pkwy   \n",
+       "1    Southport Ave & Waveland Ave    Southport Ave & Waveland Ave   \n",
+       "2      Stony Island Ave & 67th St      Stony Island Ave & 67th St   \n",
+       "3             Clark St & Grace St             Clark St & Grace St   \n",
+       "4  Southport Ave & Wrightwood Ave  Southport Ave & Wrightwood Ave   \n",
+       "\n",
+       "                              0_x     index   ID_x               Timestamp  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  108733.0  313.0  09/01/2022 01:05:02 PM   \n",
+       "1    Southport Ave & Waveland Ave  108641.0  227.0  09/01/2022 01:05:02 PM   \n",
+       "2      Stony Island Ave & 67th St  107775.0  102.0  09/01/2022 01:05:02 PM   \n",
+       "3             Clark St & Grace St  108007.0  165.0  09/01/2022 01:05:02 PM   \n",
+       "4  Southport Ave & Wrightwood Ave  108600.0  190.0  09/01/2022 01:05:02 PM   \n",
+       "\n",
+       "   Address  Total Docks_x  Docks in Service_x  Available Docks  ...  ride_id  \\\n",
+       "0      NaN           19.0                19.0             17.0  ...  49888.0   \n",
+       "1      NaN           23.0                20.0              6.0  ...  39495.0   \n",
+       "2      NaN           11.0                11.0              8.0  ...    965.0   \n",
+       "3      NaN           23.0                23.0             16.0  ...  51867.0   \n",
+       "4      NaN           15.0                15.0             12.0  ...  25727.0   \n",
+       "\n",
+       "                              0_y   ID_y  Total Docks_y  Docks in Service_y  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy  313.0           19.0                19.0   \n",
+       "1    Southport Ave & Waveland Ave  227.0           23.0                23.0   \n",
+       "2      Stony Island Ave & 67th St  102.0           11.0                11.0   \n",
+       "3             Clark St & Grace St  165.0           23.0                23.0   \n",
+       "4  Southport Ave & Wrightwood Ave  190.0           15.0                15.0   \n",
+       "\n",
+       "     Status_y Latitude_y  Longitude_y                        Location_y  \\\n",
+       "0  In Service  41.925858   -87.638973           (41.925858, -87.638973)   \n",
+       "1  In Service  41.948150   -87.663940             (41.94815, -87.66394)   \n",
+       "2  In Service  41.773458   -87.585340  (41.77345849948, -87.5853397391)   \n",
+       "3  In Service  41.950780   -87.659172            (41.95078, -87.659172)   \n",
+       "4  In Service  41.928773   -87.663913           (41.928773, -87.663913)   \n",
+       "\n",
+       "   zipcodes  \n",
+       "0     60614  \n",
+       "1     60613  \n",
+       "2     60619  \n",
+       "3     60613  \n",
+       "4     60614  \n",
+       "\n",
+       "[5 rows x 27 columns]"
+      ]
+     },
+     "execution_count": 765,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(len(station_table_merged_6))\n",
+    "print(len(station_table_merged))\n",
+    "station_table_merged_6.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 766,
+   "id": "7149138a-e363-4b6e-be17-81a86c73381f",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['new_one', 'Station Name', '0_x', 'index', 'ID_x', 'Timestamp',\n",
+       "       'Address', 'Total Docks_x', 'Docks in Service_x', 'Available Docks',\n",
+       "       'Available Bikes', 'Percent Full', 'Status_x', 'Latitude_x',\n",
+       "       'Longitude_x', 'Location_x', 'Record', 'ride_id', '0_y', 'ID_y',\n",
+       "       'Total Docks_y', 'Docks in Service_y', 'Status_y', 'Latitude_y',\n",
+       "       'Longitude_y', 'Location_y', 'zipcodes'],\n",
+       "      dtype='object')"
+      ]
+     },
+     "execution_count": 766,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "station_table_merged_6.columns"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a3b3183-fcb9-4413-882e-a22070af2af6",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Table 7"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 770,
+   "id": "c9cd5d56-0fc5-4f67-816e-21e6cdbcacc0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_7 = pd.DataFrame(station_table_merged_6[['new_one', 'Station Name', 'Timestamp',\n",
+    "       'Address', 'Total Docks_x', 'Docks in Service_x', 'Available Docks',\n",
+    "       'Available Bikes', 'Percent Full', 'Status_x', 'Latitude_x',\n",
+    "       'Longitude_x', 'Location_x', 'zipcodes']])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "298ee39f-d546-4460-993d-8493a7e34499",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Finding zipcode 2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 772,
+   "id": "2b134e37-c104-4404-982e-1bdac7869272",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "withoutzipcodes = station_table_merged_7[pd.isna(station_table_merged_7.zipcodes)]\n",
+    "withlatlong = withoutzipcodes[pd.notna(withoutzipcodes.Latitude_x)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 776,
+   "id": "69485349-e15d-411e-947e-7a0f4995aea6",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/var/folders/qw/g7lmpvlx2255lnn211m1tnp00000gn/T/ipykernel_6973/1112887275.py:1: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame.\n",
+      "Try using .loc[row_indexer,col_indexer] = value instead\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  withlatlong.loc[:,\"zipcodes\"] = withlatlong.apply(\n"
+     ]
+    }
+   ],
+   "source": [
+    "withlatlong.loc[:,\"zipcodes\"] = withlatlong.apply(\n",
+    "    get_zipcode, axis=1, geolocator=geolocator, \n",
+    "    lat_field='Latitude_x', lon_field='Longitude_x')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 782,
+   "id": "d1b466d1-88aa-4cf7-b49e-fadbbaf397f8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "withlatlong2 = pd.DataFrame(withlatlong).reset_index()[[\"Station Name\",\"zipcodes\"]]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 783,
+   "id": "46766941-f61a-404a-9dd6-3a1a95cb97a6",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>zipcodes</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Halsted St &amp; 63rd St</td>\n",
+       "      <td>60621</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Kildare Ave &amp; Division Ave</td>\n",
+       "      <td>60651</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Hyde Park Blvd &amp; 53rd St</td>\n",
+       "      <td>60615</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Damen Ave &amp; 47th St</td>\n",
+       "      <td>60609</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Hyde Park Blvd &amp; 55th St</td>\n",
+       "      <td>60637</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                 Station Name zipcodes\n",
+       "0        Halsted St & 63rd St    60621\n",
+       "1  Kildare Ave & Division Ave    60651\n",
+       "2    Hyde Park Blvd & 53rd St    60615\n",
+       "3         Damen Ave & 47th St    60609\n",
+       "4    Hyde Park Blvd & 55th St    60637"
+      ]
+     },
+     "execution_count": 783,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "withlatlong2.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e75d1dfb-038e-45ad-a2be-bc713af2538b",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Merge Table 8"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 784,
+   "id": "16ced0df-6d82-48d4-a9da-8808d1da1677",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_8 = pd.merge(station_table_merged_7, withlatlong2,  \n",
+    "                                  how='left', left_on=[\"Station Name\"], right_on = [\"Station Name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 787,
+   "id": "be1e97e6-7c5d-4866-b83d-d4c6ce0065bf",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_8.loc[pd.isna(station_table_merged_8.zipcodes_x),\"zipcodes_x\"] = station_table_merged_8.loc[pd.isna(station_table_merged_8.zipcodes_x),\"zipcodes_y\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 789,
+   "id": "8e94fd58-6e2b-4cb1-903e-a702f2c202e2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_8 = pd.DataFrame(station_table_merged_8[['new_one', 'Station Name', 'Timestamp',\n",
+    "       'Address', 'Total Docks_x', 'Docks in Service_x', 'Available Docks',\n",
+    "       'Available Bikes', 'Percent Full', 'Status_x', 'Latitude_x',\n",
+    "       'Longitude_x', 'Location_x', 'zipcodes_x']])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "300ec92c-9181-4fe7-ad0c-fa713301dd75",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Trying to fill in the rest of the zipcode"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 791,
+   "id": "1a211ecc-d705-4c30-a155-84e9cee54d21",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "onetrip_onestation = divvy_all_fixed.drop_duplicates([\"start_station_name\"],keep=\"first\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 793,
+   "id": "8495fbf4-86e4-423b-a0e3-8bd102921e07",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "notfoundstation = station_table_merged_8[pd.isna(station_table_merged_8.zipcodes_x)] "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 794,
+   "id": "bb174f62-a8f5-4402-843e-026ac2a9dfee",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "notfoundstation_merged = pd.merge(notfoundstation,onetrip_onestation, how = 'left', \n",
+    "                                  left_on=[\"new_one\"], right_on = [\"start_station_name\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 797,
+   "id": "41adf4b6-283f-4fbc-919a-72283408661a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "notfoundstation_merged.Latitude_x = notfoundstation_merged.start_lat \n",
+    "notfoundstation_merged.Longitude_x = notfoundstation_merged.start_lng"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 798,
+   "id": "b3a43ceb-d97f-46b1-b897-a60caa2ef342",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['new_one', 'Station Name', 'Timestamp', 'Address', 'Total Docks_x',\n",
+       "       'Docks in Service_x', 'Available Docks', 'Available Bikes',\n",
+       "       'Percent Full', 'Status_x', 'Latitude_x', 'Longitude_x', 'Location_x',\n",
+       "       'zipcodes_x', 'ride_id', 'rideable_type', 'started_at', 'ended_at',\n",
+       "       'start_station_name', 'start_station_id', 'end_station_name',\n",
+       "       'end_station_id', 'start_lat', 'start_lng', 'end_lat', 'end_lng',\n",
+       "       'member_casual'],\n",
+       "      dtype='object')"
+      ]
+     },
+     "execution_count": 798,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "notfoundstation_merged.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 800,
+   "id": "9fee9331-de7d-4f61-ba3c-0d84abffd18d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nfstation_merged_slice = pd.DataFrame(notfoundstation_merged[[\"new_one\",\"Station Name\",\"Latitude_x\", \"Longitude_x\"]])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 801,
+   "id": "59d2c32f-e3af-4280-9402-e4e091af8a91",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>Station Name</th>\n",
+       "      <th>Latitude_x</th>\n",
+       "      <th>Longitude_x</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>WATSON TESTING - DIVVY</td>\n",
+       "      <td>Not Found</td>\n",
+       "      <td>41.894710</td>\n",
+       "      <td>-87.730816</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Broadway &amp; Wilson Ave</td>\n",
+       "      <td>Not Found</td>\n",
+       "      <td>41.965213</td>\n",
+       "      <td>-87.658402</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Lake Shore Dr &amp; Wellington Ave</td>\n",
+       "      <td>Not Found</td>\n",
+       "      <td>41.936774</td>\n",
+       "      <td>-87.636825</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Lake Shore Dr &amp; North Blvd</td>\n",
+       "      <td>Not Found</td>\n",
+       "      <td>41.911688</td>\n",
+       "      <td>-87.626781</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Marshfield Ave &amp; Cortland St</td>\n",
+       "      <td>Not Found</td>\n",
+       "      <td>41.916063</td>\n",
+       "      <td>-87.668856</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          new_one Station Name  Latitude_x  Longitude_x\n",
+       "0          WATSON TESTING - DIVVY    Not Found   41.894710   -87.730816\n",
+       "1           Broadway & Wilson Ave    Not Found   41.965213   -87.658402\n",
+       "2  Lake Shore Dr & Wellington Ave    Not Found   41.936774   -87.636825\n",
+       "3      Lake Shore Dr & North Blvd    Not Found   41.911688   -87.626781\n",
+       "4    Marshfield Ave & Cortland St    Not Found   41.916063   -87.668856"
+      ]
+     },
+     "execution_count": 801,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "nfstation_merged_slice.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 803,
+   "id": "d8464454-5646-4981-bda1-82048e5c6f97",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "nfstation_merged_slice[\"zipcodes\"] = nfstation_merged_slice.apply(\n",
+    "    get_zipcode, axis=1, geolocator=geolocator, \n",
+    "    lat_field='Latitude_x', lon_field='Longitude_x')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 818,
+   "id": "bbdd904b-06e1-4b80-90ea-57703c9d2b23",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_9 = pd.merge(station_table_merged_8, nfstation_merged_slice,  \n",
+    "                                  how='left', left_on=[\"new_one\"], right_on = [\"new_one\"])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 819,
+   "id": "9e1b7b62-aa70-4918-927a-053b5196bf41",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_one</th>\n",
+       "      <th>Station Name_x</th>\n",
+       "      <th>Timestamp</th>\n",
+       "      <th>Address</th>\n",
+       "      <th>Total Docks_x</th>\n",
+       "      <th>Docks in Service_x</th>\n",
+       "      <th>Available Docks</th>\n",
+       "      <th>Available Bikes</th>\n",
+       "      <th>Percent Full</th>\n",
+       "      <th>Status_x</th>\n",
+       "      <th>Latitude_x_x</th>\n",
+       "      <th>Longitude_x_x</th>\n",
+       "      <th>Location_x</th>\n",
+       "      <th>zipcodes_x</th>\n",
+       "      <th>Station Name_y</th>\n",
+       "      <th>Latitude_x_y</th>\n",
+       "      <th>Longitude_x_y</th>\n",
+       "      <th>zipcodes</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>19.0</td>\n",
+       "      <td>17.0</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.925858</td>\n",
+       "      <td>-87.638973</td>\n",
+       "      <td>POINT (-87.638973 41.925858)</td>\n",
+       "      <td>60614</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>6.0</td>\n",
+       "      <td>14.0</td>\n",
+       "      <td>70.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.948150</td>\n",
+       "      <td>-87.663940</td>\n",
+       "      <td>POINT (-87.66394 41.94815)</td>\n",
+       "      <td>60613</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>11.0</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.773458</td>\n",
+       "      <td>-87.585340</td>\n",
+       "      <td>POINT (-87.5853397391 41.77345849948)</td>\n",
+       "      <td>60619</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>16.0</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>30.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.950780</td>\n",
+       "      <td>-87.659172</td>\n",
+       "      <td>POINT (-87.659172 41.95078)</td>\n",
+       "      <td>60613</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>09/01/2022 01:05:02 PM</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>15.0</td>\n",
+       "      <td>12.0</td>\n",
+       "      <td>3.0</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>In Service</td>\n",
+       "      <td>41.928773</td>\n",
+       "      <td>-87.663913</td>\n",
+       "      <td>POINT (-87.663913 41.928773)</td>\n",
+       "      <td>60614</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                          new_one                  Station Name_x  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy   Lakeview Ave & Fullerton Pkwy   \n",
+       "1    Southport Ave & Waveland Ave    Southport Ave & Waveland Ave   \n",
+       "2      Stony Island Ave & 67th St      Stony Island Ave & 67th St   \n",
+       "3             Clark St & Grace St             Clark St & Grace St   \n",
+       "4  Southport Ave & Wrightwood Ave  Southport Ave & Wrightwood Ave   \n",
+       "\n",
+       "                Timestamp  Address  Total Docks_x  Docks in Service_x  \\\n",
+       "0  09/01/2022 01:05:02 PM      NaN           19.0                19.0   \n",
+       "1  09/01/2022 01:05:02 PM      NaN           23.0                20.0   \n",
+       "2  09/01/2022 01:05:02 PM      NaN           11.0                11.0   \n",
+       "3  09/01/2022 01:05:02 PM      NaN           23.0                23.0   \n",
+       "4  09/01/2022 01:05:02 PM      NaN           15.0                15.0   \n",
+       "\n",
+       "   Available Docks  Available Bikes  Percent Full    Status_x  Latitude_x_x  \\\n",
+       "0             17.0              2.0          11.0  In Service     41.925858   \n",
+       "1              6.0             14.0          70.0  In Service     41.948150   \n",
+       "2              8.0              3.0          27.0  In Service     41.773458   \n",
+       "3             16.0              7.0          30.0  In Service     41.950780   \n",
+       "4             12.0              3.0          20.0  In Service     41.928773   \n",
+       "\n",
+       "   Longitude_x_x                             Location_x zipcodes_x  \\\n",
+       "0     -87.638973           POINT (-87.638973 41.925858)      60614   \n",
+       "1     -87.663940             POINT (-87.66394 41.94815)      60613   \n",
+       "2     -87.585340  POINT (-87.5853397391 41.77345849948)      60619   \n",
+       "3     -87.659172            POINT (-87.659172 41.95078)      60613   \n",
+       "4     -87.663913           POINT (-87.663913 41.928773)      60614   \n",
+       "\n",
+       "  Station Name_y  Latitude_x_y  Longitude_x_y zipcodes  \n",
+       "0            NaN           NaN            NaN      NaN  \n",
+       "1            NaN           NaN            NaN      NaN  \n",
+       "2            NaN           NaN            NaN      NaN  \n",
+       "3            NaN           NaN            NaN      NaN  \n",
+       "4            NaN           NaN            NaN      NaN  "
+      ]
+     },
+     "execution_count": 819,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "station_table_merged_9.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 820,
+   "id": "fcfa5d6e-097c-4d4a-84d4-9bbfa37d90ac",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_9.loc[pd.isna(station_table_merged_9.zipcodes_x),\"zipcodes_x\"] = station_table_merged_9.loc[pd.isna(station_table_merged_9.zipcodes_x),\"zipcodes\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 821,
+   "id": "e93db12f-7159-4297-84d9-f9e314b6ccd1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_9.loc[pd.isna(station_table_merged_9.Latitude_x_x),\"Latitude_x_x\"] = station_table_merged_9.loc[pd.isna(station_table_merged_9.Latitude_x_x),\"Latitude_x_y\"]\n",
+    "station_table_merged_9.loc[pd.isna(station_table_merged_9.Longitude_x_x),\"Longitude_x_x\"] = station_table_merged_9.loc[pd.isna(station_table_merged_9.Longitude_x_x),\"Longitude_x_y\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 822,
+   "id": "b2846b13-399f-45db-8574-f156041f92ee",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_9 = pd.DataFrame(station_table_merged_9[['new_one', 'Station Name_x', 'Timestamp',\n",
+    "       'Address', 'Total Docks_x', 'Docks in Service_x', 'Available Docks',\n",
+    "       'Available Bikes', 'Percent Full', 'Status_x', 'Latitude_x_x',\n",
+    "       'Longitude_x_x', 'Location_x', 'zipcodes_x']])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 823,
+   "id": "b95e3708-2283-4afc-8ce0-44b18f776b8c",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "new_one                  0\n",
+       "Station Name_x           0\n",
+       "Timestamp              106\n",
+       "Address               1889\n",
+       "Total Docks_x          106\n",
+       "Docks in Service_x     106\n",
+       "Available Docks        106\n",
+       "Available Bikes        106\n",
+       "Percent Full           106\n",
+       "Status_x               106\n",
+       "Latitude_x_x             0\n",
+       "Longitude_x_x            0\n",
+       "Location_x             106\n",
+       "zipcodes_x               0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 823,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "pd.isna(station_table_merged_9).sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "15fb5cc8-2d85-4672-a736-32d4de50950d",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "#### Problem 3: Calculating the distance of the trip"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 826,
+   "id": "d5e52aa8-ad0a-43e9-8f59-f68743773443",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>ride_id</th>\n",
+       "      <th>rideable_type</th>\n",
+       "      <th>started_at</th>\n",
+       "      <th>ended_at</th>\n",
+       "      <th>start_station_name</th>\n",
+       "      <th>start_station_id</th>\n",
+       "      <th>end_station_name</th>\n",
+       "      <th>end_station_id</th>\n",
+       "      <th>start_lat</th>\n",
+       "      <th>start_lng</th>\n",
+       "      <th>end_lat</th>\n",
+       "      <th>end_lng</th>\n",
+       "      <th>member_casual</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>ACB6B40CF5B9044C</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:39:43</td>\n",
+       "      <td>2020-10-31 19:57:12</td>\n",
+       "      <td>Lakeview Ave &amp; Fullerton Pkwy</td>\n",
+       "      <td>313.0</td>\n",
+       "      <td>Rush St &amp; Hubbard St</td>\n",
+       "      <td>125.0</td>\n",
+       "      <td>41.926101</td>\n",
+       "      <td>-87.638977</td>\n",
+       "      <td>41.890345</td>\n",
+       "      <td>-87.626068</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>DF450C72FD109C01</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:50:08</td>\n",
+       "      <td>2020-11-01 00:04:16</td>\n",
+       "      <td>Southport Ave &amp; Waveland Ave</td>\n",
+       "      <td>227.0</td>\n",
+       "      <td>Kedzie Ave &amp; Milwaukee Ave</td>\n",
+       "      <td>260.0</td>\n",
+       "      <td>41.948172</td>\n",
+       "      <td>-87.663911</td>\n",
+       "      <td>41.929528</td>\n",
+       "      <td>-87.707818</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>B6396B54A15AC0DF</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 23:00:01</td>\n",
+       "      <td>2020-10-31 23:08:22</td>\n",
+       "      <td>Stony Island Ave &amp; 67th St</td>\n",
+       "      <td>102.0</td>\n",
+       "      <td>University Ave &amp; 57th St</td>\n",
+       "      <td>423.0</td>\n",
+       "      <td>41.773462</td>\n",
+       "      <td>-87.585372</td>\n",
+       "      <td>41.791455</td>\n",
+       "      <td>-87.600050</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>44A4AEE261B9E854</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 22:16:43</td>\n",
+       "      <td>2020-10-31 22:19:35</td>\n",
+       "      <td>Clark St &amp; Grace St</td>\n",
+       "      <td>165.0</td>\n",
+       "      <td>Broadway &amp; Sheridan Rd</td>\n",
+       "      <td>256.0</td>\n",
+       "      <td>41.950855</td>\n",
+       "      <td>-87.659244</td>\n",
+       "      <td>41.952809</td>\n",
+       "      <td>-87.650103</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>10B7DD76A6A2EB95</td>\n",
+       "      <td>electric_bike</td>\n",
+       "      <td>2020-10-31 19:38:19</td>\n",
+       "      <td>2020-10-31 19:54:32</td>\n",
+       "      <td>Southport Ave &amp; Wrightwood Ave</td>\n",
+       "      <td>190.0</td>\n",
+       "      <td>Stave St &amp; Armitage Ave</td>\n",
+       "      <td>185.0</td>\n",
+       "      <td>41.928857</td>\n",
+       "      <td>-87.663962</td>\n",
+       "      <td>41.917777</td>\n",
+       "      <td>-87.691434</td>\n",
+       "      <td>casual</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "            ride_id  rideable_type           started_at             ended_at  \\\n",
+       "0  ACB6B40CF5B9044C  electric_bike  2020-10-31 19:39:43  2020-10-31 19:57:12   \n",
+       "1  DF450C72FD109C01  electric_bike  2020-10-31 23:50:08  2020-11-01 00:04:16   \n",
+       "2  B6396B54A15AC0DF  electric_bike  2020-10-31 23:00:01  2020-10-31 23:08:22   \n",
+       "3  44A4AEE261B9E854  electric_bike  2020-10-31 22:16:43  2020-10-31 22:19:35   \n",
+       "4  10B7DD76A6A2EB95  electric_bike  2020-10-31 19:38:19  2020-10-31 19:54:32   \n",
+       "\n",
+       "               start_station_name start_station_id  \\\n",
+       "0   Lakeview Ave & Fullerton Pkwy            313.0   \n",
+       "1    Southport Ave & Waveland Ave            227.0   \n",
+       "2      Stony Island Ave & 67th St            102.0   \n",
+       "3             Clark St & Grace St            165.0   \n",
+       "4  Southport Ave & Wrightwood Ave            190.0   \n",
+       "\n",
+       "             end_station_name end_station_id  start_lat  start_lng    end_lat  \\\n",
+       "0        Rush St & Hubbard St          125.0  41.926101 -87.638977  41.890345   \n",
+       "1  Kedzie Ave & Milwaukee Ave          260.0  41.948172 -87.663911  41.929528   \n",
+       "2    University Ave & 57th St          423.0  41.773462 -87.585372  41.791455   \n",
+       "3      Broadway & Sheridan Rd          256.0  41.950855 -87.659244  41.952809   \n",
+       "4     Stave St & Armitage Ave          185.0  41.928857 -87.663962  41.917777   \n",
+       "\n",
+       "     end_lng member_casual  \n",
+       "0 -87.626068        casual  \n",
+       "1 -87.707818        casual  \n",
+       "2 -87.600050        casual  \n",
+       "3 -87.650103        casual  \n",
+       "4 -87.691434        casual  "
+      ]
+     },
+     "execution_count": 826,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "divvy_all_fixed.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 835,
+   "id": "f685c5eb-827b-4e33-bb93-67c1547135cd",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/var/folders/qw/g7lmpvlx2255lnn211m1tnp00000gn/T/ipykernel_6973/712714324.py:1: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame.\n",
+      "Try using .loc[row_indexer,col_indexer] = value instead\n",
+      "\n",
+      "See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n",
+      "  divvy_all_fixed[\"distance\"] = haversine((divvy_all_fixed[\"start_lat\"]),\n"
+     ]
+    }
+   ],
+   "source": [
+    "divvy_all_fixed[\"distance\"] = haversine((divvy_all_fixed[\"start_lat\"]),\n",
+    "                                        (divvy_all_fixed[\"start_lng\"]),\n",
+    "                                        (divvy_all_fixed[\"end_lat\"]),\n",
+    "                                        (divvy_all_fixed[\"end_lng\"]))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 837,
+   "id": "2fe057f3-be28-4644-b040-8b5cf0983a3b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>distance</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2.558826</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2.599167</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>1.455519</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>0.488879</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>1.606871</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   distance\n",
+       "0  2.558826\n",
+       "1  2.599167\n",
+       "2  1.455519\n",
+       "3  0.488879\n",
+       "4  1.606871"
+      ]
+     },
+     "execution_count": 837,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "trip_distance = pd.DataFrame(divvy_all_fixed[\"distance\"])\n",
+    "trip_distance.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6b3d838b-4ee2-4547-94b6-b29a22bde806",
+   "metadata": {
+    "jp-MarkdownHeadingCollapsed": true,
+    "tags": []
+   },
+   "source": [
+    "### End of Stage 1: Getting the CSV file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 825,
+   "id": "46ac3903-008c-4b3d-a89a-f0d39fe7a13a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "station_table_merged_9.to_csv(\"station_table_final.csv\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 775,
+   "id": "0c84e0e4-9b62-4e61-9b1d-bae787ef929b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "divvy_all_fixed.to_csv(\"divvy_all_fixed.csv\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 838,
+   "id": "b75b9dd5-d609-4c06-ab07-14db978376c2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trip_distance.to_csv(\"trip_distance.csv\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
